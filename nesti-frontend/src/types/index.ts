@@ -28,10 +28,37 @@ export interface Order {
   id: string;
   user_id: string;
   total_amount: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+
+  // ✅ sinkron dengan backend
+  status:
+    | 'pending'
+    | 'paid'
+    | 'processing'
+    | 'shipped'
+    | 'delivered'
+    | 'cancelled';
+
   shipping_address: ShippingAddress;
+
   created_at: string;
+
+  // ✅ relasi item order
   order_items: OrderItem[];
+  items: OrderItem[];
+
+  payment_method?: string;
+
+  // ✅ status pembayaran sesuai Midtrans
+  payment_status:
+    | 'pending'
+    | 'paid'
+    | 'challenge'
+    | 'denied'
+    | 'expired'
+    | 'cancelled';
+
+  // ✅ opsional: simpan Transaction ID dari Midtrans
+  transaction_id?: string;
 }
 
 export interface OrderItem {
@@ -58,7 +85,7 @@ export interface User {
   full_name?: string;
   phone?: string;
   created_at: string;
-  role: string; 
+  role: string;
 }
 
 export interface Wishlist {

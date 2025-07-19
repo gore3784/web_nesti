@@ -1,29 +1,30 @@
 import { useEffect, useState } from 'react'
 import axios from '@/lib/axios'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { CalendarIcon, ArchiveBoxIcon, TruckIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs'
+import { CalendarIcon } from '@heroicons/react/24/outline'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
-import { PaymentMethodModal } from '@/components/payment/PaymentMethodModal'
-
-interface OrderItem {
-  id: number
-  quantity: number
-  price: number
-  product: { id: number; name: string; image?: string }
-}
-
-interface ShippingAddress {
-  full_name: string
-  address: string
-  city: string
-  province: string
-  postal_code: string
-}
+import type { OrderItem, ShippingAddress } from '@/types'
 
 interface Order {
   id: number
@@ -33,55 +34,78 @@ interface Order {
   items: OrderItem[]
   shipping_address: ShippingAddress
   payment_method?: string
+  payment_status?: string
+  order_number?: string
 }
 
 export const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
-
-  // state modal detail
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
 
-  // state modal payment
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
-  const [selectedMethod, setSelectedMethod] = useState('')
-  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null)
-
-  const fetchOrders = async () => {
-    try {
-      const res = await axios.get<Order[]>('/api/orders')
-      setOrders(res.data)
-    } catch (e: any) {
-      console.error(e)
-      toast.error('Failed to load orders')
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get<Order[]>('/api/orders')
+        setOrders(res.data)
+      } catch (e: any) {
+        console.error(e)
+        toast.error('Failed to load orders')
+      } finally {
+        setLoading(false)
+      }
+    }
     fetchOrders()
   }, [])
 
   const formatPrice = (price: number) =>
-    new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price)
+    new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+    }).format(price)
 
   const formatDate = (dateString: string) =>
-    new Date(dateString).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })
+    new Date(dateString).toLocaleDateString('id-ID', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
         return <Badge className="bg-yellow-500">Pending</Badge>
       case 'paid':
-        return <Badge>Paid</Badge>
+        return <Badge className="bg-green-500">Paid</Badge>
       case 'shipped':
         return <Badge className="bg-blue-500">Shipped</Badge>
       case 'completed':
-        return <Badge className="bg-green-500">Delivered</Badge>
+        return <Badge className="bg-emerald-600">Delivered</Badge>
+      case 'cancelled':
+        return <Badge variant="destructive">Cancelled</Badge>
       default:
         return <Badge variant="secondary">{status}</Badge>
+    }
+  }
+
+  const getPaymentBadge = (paymentStatus?: string) => {
+    switch (paymentStatus) {
+      case 'paid':
+        return <Badge className="bg-green-500">Payment: Paid</Badge>
+      case 'pending':
+        return <Badge className="bg-yellow-500">Payment: Pending</Badge>
+      case 'expired':
+        return <Badge variant="destructive">Payment: Expired</Badge>
+      case 'cancelled':
+        return <Badge variant="destructive">Payment: Cancelled</Badge>
+      case 'challenge':
+        return <Badge variant="outline">Payment: Challenge</Badge>
+      default:
+        return paymentStatus ? (
+          <Badge variant="secondary">Payment: {paymentStatus}</Badge>
+        ) : null
     }
   }
 
@@ -90,28 +114,56 @@ export const Orders = () => {
     setIsDetailOpen(true)
   }
 
-  const openPaymentModal = (orderId: number) => {
-    setSelectedOrderId(orderId)
-    setIsPaymentModalOpen(true)
+  if (loading) {
+    return <div className="container py-8">Loading orders...</div>
   }
 
-  const handleConfirmPayment = async () => {
-    if (!selectedOrderId || !selectedMethod) return
-    try {
-      await axios.put(`/api/orders/${selectedOrderId}/pay`, { payment_method: selectedMethod })
-      toast.success('Metode pembayaran diperbarui!')
-      fetchOrders()
-    } catch (err: any) {
-      console.error(err)
-      toast.error('Gagal memperbarui pembayaran')
-    } finally {
-      setIsPaymentModalOpen(false)
-      setSelectedMethod('')
-      setSelectedOrderId(null)
+  const renderOrders = (filter?: string) => {
+    const filtered = filter && filter !== 'all'
+      ? orders.filter((o) => o.status === filter)
+      : orders
+    if (filtered.length === 0) {
+      return <p className="text-sm text-muted-foreground">No orders found.</p>
     }
+    return filtered.map((order) => (
+      <Card key={order.id} className="shadow-sm">
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle className="text-lg">
+                Order #{order.order_number ?? order.id}
+              </CardTitle>
+              <CardDescription className="flex items-center gap-3 mt-1">
+                <span className="flex items-center gap-1">
+                  <CalendarIcon className="h-4 w-4" />
+                  {formatDate(order.created_at)}
+                </span>
+                <span>{order.items.length} items</span>
+                {getPaymentBadge(order.payment_status)}
+              </CardDescription>
+            </div>
+            <div className="text-right">
+              {getStatusBadge(order.status)}
+              <div className="text-lg font-bold mt-1">
+                {formatPrice(order.total_amount)}
+              </div>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="border-t pt-4 flex justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => openDetail(order)}
+            >
+              View Details
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    ))
   }
-
-  if (loading) return <div className="container py-8">Loading orders...</div>
 
   return (
     <div className="container py-8">
@@ -119,145 +171,106 @@ export const Orders = () => {
       <p className="text-muted-foreground mb-6">Track and manage your orders</p>
 
       <Tabs defaultValue="all">
-        <TabsList className="grid grid-cols-4 w-full mb-4">
+        <TabsList className="grid grid-cols-6 w-full mb-4">
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="pending">Pending</TabsTrigger>
           <TabsTrigger value="paid">Paid</TabsTrigger>
+          <TabsTrigger value="shipped">Shipped</TabsTrigger>
           <TabsTrigger value="completed">Delivered</TabsTrigger>
+          <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="space-y-6">
-          {orders.map((order) => (
-            <Card key={order.id}>
-              <CardHeader>
-                <div className="flex justify-between">
-                  <div>
-                    <CardTitle>Order #{order.id}</CardTitle>
-                    <CardDescription className="flex items-center gap-3">
-                      <span className="flex items-center gap-1">
-                        <CalendarIcon className="h-4 w-4" /> {formatDate(order.created_at)}
-                      </span>
-                      <span>{order.items.length} items</span>
-                    </CardDescription>
-                  </div>
-                  <div className="text-right">
-                    {getStatusBadge(order.status)}
-                    <div className="text-lg font-bold mt-1">{formatPrice(order.total_amount)}</div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="border-t pt-4 flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => openDetail(order)}>
-                    View Details
-                  </Button>
-                  {order.status === 'pending' && (
-                    <Button size="sm" onClick={() => openPaymentModal(order.id)}>
-                      Bayar Sekarang
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          {renderOrders('all')}
         </TabsContent>
-
-        {/* tab lain */}
-        {['pending', 'paid', 'completed'].map((status) => (
-          <TabsContent key={status} value={status} className="space-y-6">
-            {orders
-              .filter((o) => o.status === status)
-              .map((order) => (
-                <Card key={order.id}>
-                  <CardHeader>
-                    <div className="flex justify-between">
-                      <div>
-                        <CardTitle>Order #{order.id}</CardTitle>
-                        <CardDescription className="flex items-center gap-3">
-                          <span className="flex items-center gap-1">
-                            <CalendarIcon className="h-4 w-4" /> {formatDate(order.created_at)}
-                          </span>
-                          <span>{order.items.length} items</span>
-                        </CardDescription>
-                      </div>
-                      <div className="text-right">
-                        {getStatusBadge(order.status)}
-                        <div className="text-lg font-bold mt-1">{formatPrice(order.total_amount)}</div>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="border-t pt-4 flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => openDetail(order)}>
-                        View Details
-                      </Button>
-                      {order.status === 'pending' && (
-                        <Button size="sm" onClick={() => openPaymentModal(order.id)}>
-                          Bayar Sekarang
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-          </TabsContent>
-        ))}
+        <TabsContent value="pending" className="space-y-6">
+          {renderOrders('pending')}
+        </TabsContent>
+        <TabsContent value="paid" className="space-y-6">
+          {renderOrders('paid')}
+        </TabsContent>
+        <TabsContent value="shipped" className="space-y-6">
+          {renderOrders('shipped')}
+        </TabsContent>
+        <TabsContent value="completed" className="space-y-6">
+          {renderOrders('completed')}
+        </TabsContent>
+        <TabsContent value="cancelled" className="space-y-6">
+          {renderOrders('cancelled')}
+        </TabsContent>
       </Tabs>
 
       {/* Modal Detail */}
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Order Details - #{selectedOrder?.id}</DialogTitle>
+            <DialogTitle>
+              Order Details – #{selectedOrder?.order_number ?? selectedOrder?.id}
+            </DialogTitle>
           </DialogHeader>
           {selectedOrder && (
             <div className="space-y-4">
+              {/* Shipping info */}
               <div className="border p-3 rounded-md">
                 <h4 className="font-medium mb-2">Shipping Address</h4>
                 <p className="text-sm text-muted-foreground">
-                  {selectedOrder.shipping_address.full_name} <br />
-                  {selectedOrder.shipping_address.address} <br />
-                  {selectedOrder.shipping_address.city}, {selectedOrder.shipping_address.province}{' '}
+                  {selectedOrder.shipping_address.full_name}
+                  <br />
+                  {selectedOrder.shipping_address.address}
+                  <br />
+                  {selectedOrder.shipping_address.city},{' '}
+                  {selectedOrder.shipping_address.province}{' '}
                   {selectedOrder.shipping_address.postal_code}
+                  <br />
+                  📞 {selectedOrder.shipping_address.phone}
                 </p>
               </div>
+
+              {/* Items */}
               <div className="space-y-2">
                 <h4 className="font-medium">Items</h4>
                 {selectedOrder.items.map((item) => (
                   <div key={item.id} className="flex justify-between text-sm">
-                    <span>{item.product.name} × {item.quantity}</span>
+                    <span>
+                      {item.product.name} × {item.quantity}
+                    </span>
                     <span>{formatPrice(item.price * item.quantity)}</span>
                   </div>
                 ))}
               </div>
-              <Separator />
-              <div className="flex justify-between font-semibold">
-                <span>Total</span>
-                <span>{formatPrice(selectedOrder.total_amount)}</span>
-              </div>
 
-              {/* upload/share bukti pembayaran */}
-              {selectedOrder.status === 'pending' && (
-                <div className="pt-4">
-                  <Button variant="outline" className="w-full">
-                    Upload Bukti Pembayaran
-                  </Button>
-                  {/* nanti bisa diganti dengan input file atau redirect ke form upload */}
-                </div>
-              )}
+              <Separator />
+
+              {/* Totals */}
+              {(() => {
+                // Hitung shipping dari provinsi atau aturan lain
+                const shippingCost =
+                  selectedOrder.shipping_address.province.toLowerCase().includes('ntt')
+                    ? 50000
+                    : 100000
+                const grandTotal = selectedOrder.total_amount + shippingCost
+                return (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span>Subtotal</span>
+                      <span>{formatPrice(selectedOrder.total_amount)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Shipping</span>
+                      <span>{formatPrice(shippingCost)}</span>
+                    </div>
+                    <Separator />
+                    <div className="flex justify-between font-semibold">
+                      <span>Total</span>
+                      <span>{formatPrice(grandTotal)}</span>
+                    </div>
+                  </>
+                )
+              })()}
             </div>
           )}
         </DialogContent>
       </Dialog>
-
-      {/* Payment Method Modal */}
-      <PaymentMethodModal
-        open={isPaymentModalOpen}
-        onOpenChange={setIsPaymentModalOpen}
-        selectedMethod={selectedMethod}
-        onMethodSelect={setSelectedMethod}
-        onConfirm={handleConfirmPayment}
-      />
     </div>
   )
 }

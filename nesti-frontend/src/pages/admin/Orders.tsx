@@ -80,6 +80,25 @@ export const AdminOrders = () => {
     }
   };
 
+  const getPaymentBadge = (payment_status: string) => {
+    switch (payment_status) {
+      case 'paid':
+        return <Badge className="bg-green-500">Paid</Badge>;
+      case 'pending':
+        return <Badge variant="secondary">Pending</Badge>;
+      case 'expired':
+        return <Badge variant="destructive">Expired</Badge>;
+      case 'cancelled':
+        return <Badge variant="destructive">Cancelled</Badge>;
+      case 'challenge':
+        return <Badge variant="outline">Challenge</Badge>;
+      case 'denied':
+        return <Badge variant="destructive">Denied</Badge>;
+      default:
+        return <Badge variant="secondary">{payment_status}</Badge>;
+    }
+  };
+
   const formatPrice = (price: number) =>
     new Intl.NumberFormat('id-ID', {
       style: 'currency',
@@ -168,6 +187,7 @@ export const AdminOrders = () => {
                 <TableHead>Date</TableHead>
                 <TableHead>Total</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Payment</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -206,6 +226,10 @@ export const AdminOrders = () => {
                       </SelectContent>
                     </Select>
                   </TableCell>
+                  {/* Payment status dari Midtrans */}
+                  <TableCell>
+                    {getPaymentBadge(order.payment_status)}
+                  </TableCell>
                   <TableCell>
                     <Button
                       variant="ghost"
@@ -223,105 +247,101 @@ export const AdminOrders = () => {
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-  <DialogContent className="max-w-4xl">
-    <DialogHeader>
-      <DialogTitle>
-        Order Details&nbsp;
-        {selectedOrder && <span className="font-mono">#{selectedOrder.id}</span>}
-      </DialogTitle>
-    </DialogHeader>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>
+              Order Details&nbsp;
+              {selectedOrder && <span className="font-mono">#{selectedOrder.id}</span>}
+            </DialogTitle>
+          </DialogHeader>
 
-    {selectedOrder ? (
-      <div className="space-y-6">
-        {/* ✅ Customer & Order Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Customer Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <p><strong>Name:</strong> {selectedOrder.shipping_address?.full_name ?? '-'}</p>
-              <p><strong>Phone:</strong> {selectedOrder.shipping_address?.phone ?? '-'}</p>
-              <p><strong>Address:</strong> {selectedOrder.shipping_address?.address ?? '-'}</p>
-              <p><strong>City:</strong> {selectedOrder.shipping_address?.city ?? '-'}</p>
-              <p><strong>Province:</strong> {selectedOrder.shipping_address?.province ?? '-'}</p>
-              <p><strong>Postal Code:</strong> {selectedOrder.shipping_address?.postal_code ?? '-'}</p>
-            </CardContent>
-          </Card>
+          {selectedOrder ? (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Customer Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2 text-sm">
+                    <p><strong>Name:</strong> {selectedOrder.shipping_address?.full_name ?? '-'}</p>
+                    <p><strong>Phone:</strong> {selectedOrder.shipping_address?.phone ?? '-'}</p>
+                    <p><strong>Address:</strong> {selectedOrder.shipping_address?.address ?? '-'}</p>
+                    <p><strong>City:</strong> {selectedOrder.shipping_address?.city ?? '-'}</p>
+                    <p><strong>Province:</strong> {selectedOrder.shipping_address?.province ?? '-'}</p>
+                    <p><strong>Postal Code:</strong> {selectedOrder.shipping_address?.postal_code ?? '-'}</p>
+                  </CardContent>
+                </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Order Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-sm">
-              <p><strong>Date:</strong> {formatDate(selectedOrder.created_at)}</p>
-              <p><strong>Status:</strong> {getStatusBadge(selectedOrder.status)}</p>
-              <p><strong>Total:</strong> {formatPrice(selectedOrder.total_amount)}</p>
-              {/* <p><strong>Payment:</strong> {selectedOrder.payment_method ?? '—'}</p> */}
-              <p><strong>Payment:</strong> Pembayaran</p>
-            </CardContent>
-          </Card>
-        </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Order Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2 text-sm">
+                    <p><strong>Date:</strong> {formatDate(selectedOrder.created_at)}</p>
+                    <p><strong>Status:</strong> {getStatusBadge(selectedOrder.status)}</p>
+                    <p><strong>Payment:</strong> {getPaymentBadge(selectedOrder.payment_status)}</p>
+                    <p><strong>Total:</strong> {formatPrice(selectedOrder.total_amount)}</p>
+                  </CardContent>
+                </Card>
+              </div>
 
-        {/* ✅ Order Items */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Order Items</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Product</TableHead>
-                  <TableHead>Quantity</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Total</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {selectedOrder.order_items?.length ? (
-                  selectedOrder.order_items.map((item: OrderItem) => (
-                    <TableRow key={item.id}>
-                      <TableCell>
-                        <div className="flex items-center space-x-3">
-                          {item.product?.image && (
-                            <img
-                              src={item.product.image}
-                              alt={item.product.name}
-                              className="w-12 h-12 rounded object-cover"
-                            />
-                          )}
-                          <div>
-                            <p className="font-medium">{item.product?.name}</p>
-                            <p className="text-xs text-muted-foreground">{item.product?.description}</p>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{item.quantity}</TableCell>
-                      <TableCell>{formatPrice(item.product.price)}</TableCell>
-                      <TableCell className="font-medium">
-                        {formatPrice(item.price)}
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground">
-                      No items found in this order.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </div>
-    ) : (
-      <p className="text-center text-muted-foreground py-6">No order selected.</p>
-    )}
-  </DialogContent>
-</Dialog>
-
+              <Card>
+                <CardHeader>
+                  <CardTitle>Order Items</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Product</TableHead>
+                        <TableHead>Quantity</TableHead>
+                        <TableHead>Price</TableHead>
+                        <TableHead>Total</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {selectedOrder.order_items?.length ? (
+                        selectedOrder.order_items.map((item: OrderItem) => (
+                          <TableRow key={item.id}>
+                            <TableCell>
+                              <div className="flex items-center space-x-3">
+                                {item.product?.image && (
+                                  <img
+                                    src={item.product.image}
+                                    alt={item.product.name}
+                                    className="w-12 h-12 rounded object-cover"
+                                  />
+                                )}
+                                <div>
+                                  <p className="font-medium">{item.product?.name}</p>
+                                  <p className="text-xs text-muted-foreground">{item.product?.description}</p>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>{item.quantity}</TableCell>
+                            <TableCell>{formatPrice(item.product.price)}</TableCell>
+                            <TableCell className="font-medium">
+                              {formatPrice(item.price)}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={4} className="text-center text-muted-foreground">
+                            No items found in this order.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <p className="text-center text-muted-foreground py-6">No order selected.</p>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

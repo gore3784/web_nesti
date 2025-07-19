@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    // Simpan order baru
+    /**
+     * 🔹 Simpan order baru
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -21,7 +23,6 @@ class OrderController extends Controller
             'shipping_address.city' => 'required|string|max:100',
             'shipping_address.province' => 'required|string|max:100',
             'shipping_address.postal_code' => 'required|string|max:10',
-            'payment_method' => 'required|string',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|integer|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
@@ -32,7 +33,7 @@ class OrderController extends Controller
         return DB::transaction(function () use ($validated) {
             $userId = Auth::id();
 
-            // simpan shipping address
+            // ✅ simpan shipping address
             $shipping = ShippingAddress::create([
                 'user_id' => $userId,
                 'full_name' => $validated['shipping_address']['full_name'],
@@ -43,16 +44,20 @@ class OrderController extends Controller
                 'postal_code' => $validated['shipping_address']['postal_code'],
             ]);
 
-            // simpan order
+            // ✅ buat order_number unik
+            $orderNumber = 'ORDER-' . time() . '-' . rand(1000, 9999);
+
+            // ✅ simpan order
             $order = Order::create([
                 'user_id' => $userId,
                 'shipping_address_id' => $shipping->id,
                 'total_amount' => $validated['total_amount'],
-                'payment_method' => $validated['payment_method'],
                 'status' => 'pending',
+                'payment_status' => 'pending',
+                'order_number' => $orderNumber,
             ]);
 
-            // simpan order items
+            // ✅ simpan order items
             foreach ($validated['items'] as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -64,19 +69,20 @@ class OrderController extends Controller
 
             return response()->json([
                 'message' => 'Order created successfully',
-                'order_id' => $order->id,
+                'order_id' => $order->id,            // ID integer
+                'order_number' => $order->order_number,  // kirim juga ke frontend
                 'status' => $order->status,
             ], 201);
         });
     }
 
-    // Lihat semua order user
+    /**
+     * 🔹 Lihat semua order milik user
+     */
     public function index(Request $request)
     {
-        // Ambil user yang sedang login
-        $user = $request->user(); // atau Auth::user()
+        $user = $request->user();
 
-        // Ambil semua order milik user ini, sekaligus load relasi items.product & shippingAddress
         $orders = Order::with(['items.product', 'shippingAddress'])
             ->where('user_id', $user->id)
             ->latest()
@@ -85,38 +91,44 @@ class OrderController extends Controller
         return response()->json($orders);
     }
 
-    // Lihat detail order tertentu
+    /**
+     * 🔹 Lihat detail order tertentu
+     */
     public function show($id)
     {
         $user = Auth::user();
-        $order = Order::with('items.product', 'shippingAddress')
+
+        $order = Order::with(['items.product', 'shippingAddress'])
             ->where('user_id', $user->id)
             ->findOrFail($id);
 
         return response()->json($order);
     }
 
-    // 🔹 Ambil semua order untuk admin
+    /**
+     * 🔹 Lihat semua order (admin)
+     */
     public function adminIndex()
     {
-        // Pastikan hanya admin yang boleh (bisa cek via middleware atau role)
-        if (Auth::user()->role !== 'admin') {
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
             return response()->json(['message' => 'Unauthorized'], 403);
-        } // atau cek Auth::user()->role == 'admin'
+        }
 
-        $orders = Order::with('items.product', 'shippingAddress')
+        $orders = Order::with(['items.product', 'shippingAddress'])
             ->latest()
             ->get();
 
         return response()->json($orders);
     }
 
-    // 🔹 Update status order
+    /**
+     * 🔹 Update status order (admin)
+     */
     public function updateStatus(Request $request, $id)
     {
         if (Auth::user()->role !== 'admin') {
             return response()->json(['message' => 'Unauthorized'], 403);
-        } // atau cek role admin
+        }
 
         $validated = $request->validate([
             'status' => 'required|in:pending,paid,shipped,completed,cancelled',
@@ -132,5 +144,4 @@ class OrderController extends Controller
             'status' => $order->status,
         ]);
     }
-
 }

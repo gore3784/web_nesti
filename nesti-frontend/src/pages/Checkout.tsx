@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -8,12 +8,27 @@ import { Separator } from '@/components/ui/separator'
 import { useStore } from '@/store/useStore'
 import { ShippingAddress } from '@/types'
 import { toast } from 'sonner'
-import axios from '@/lib/axios' // ✅ pakai axios dengan interceptor token
+import axios from '@/lib/axios'
+
+interface MidtransResponse {
+  snapToken: string
+  order_id: string
+}
+
+interface WilayahItem {
+  code: string
+  name: string
+}
 
 export const Checkout = () => {
   const navigate = useNavigate()
   const { cartItems, getCartTotal, clearCart } = useStore()
   const [loading, setLoading] = useState(false)
+  const [snapReady, setSnapReady] = useState(false)
+
+  // data wilayah
+  const [provinces, setProvinces] = useState<WilayahItem[]>([])
+  const [regencies, setRegencies] = useState<WilayahItem[]>([])
 
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
     full_name: '',
@@ -24,39 +39,66 @@ export const Checkout = () => {
     province: '',
   })
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('id-ID', {
+  useEffect(() => {
+    const loadProvinces = async () => {
+      try {
+        const res = await fetch('http://localhost:8000/api/proxy/provinces')
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`)
+        }
+        const json = await res.json()
+        setProvinces(json.data)
+      } catch (err) {
+        console.error('Fetch provinces error:', err)
+        toast.error('Gagal memuat provinsi')
+      }
+    }
+
+    loadProvinces()
+    if ((window as any).snap) setSnapReady(true)
+  }, [])
+
+  const handleProvinceChange = (provCode: string) => {
+    setShippingAddress(prev => ({ ...prev, province: provCode, city: '' }))
+    if (!provCode) {
+      setRegencies([])
+      return
+    }
+    fetch(`http://localhost:8000/api/proxy/regencies/${provCode}`)
+      .then(res => res.json())
+      .then(json => setRegencies(json.data))
+      .catch(() => toast.error('Gagal memuat kabupaten/kota'))
+  }
+
+  const handleInputChange = (field: keyof ShippingAddress, value: string) => {
+    setShippingAddress(prev => ({ ...prev, [field]: value }))
+  }
+
+  // hitung total
+  const subtotal = getCartTotal()
+  const shippingCost = shippingAddress.province === '53' ? 50000 : 100000
+  const grandTotal = subtotal + shippingCost
+
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat('id-ID', {
       style: 'currency',
       currency: 'IDR',
       minimumFractionDigits: 0,
     }).format(price)
-  }
-
-  const handleInputChange = (field: keyof ShippingAddress, value: string) => {
-    setShippingAddress((prev) => ({
-      ...prev,
-      [field]: value,
-    }))
-  }
-
-  const subtotal = getCartTotal()
-  const shipping = 50000
-  const grandTotal = subtotal + shipping
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Validasi alamat
-    const requiredFields: (keyof ShippingAddress)[] = [
+    const required: (keyof ShippingAddress)[] = [
       'full_name',
       'phone',
       'address',
       'city',
       'postal_code',
-      'province',
+      'province'
     ]
-    for (const field of requiredFields) {
-      if (!shippingAddress[field].trim()) {
+    for (const field of required) {
+      if (!shippingAddress[field]?.toString().trim()) {
         toast.error(`Please fill in ${field.replace('_', ' ')}`)
         return
       }
@@ -67,33 +109,65 @@ export const Checkout = () => {
       return
     }
 
-    setLoading(true)
+    if (!snapReady) {
+      toast.error('Payment system not ready. Snap JS belum termuat.')
+      return
+    }
 
+    setLoading(true)
     try {
-      await axios.post('/api/orders', {
+      // 👉 gabungkan items barang dengan shipping sebagai item baru
+      const itemsWithShipping = [
+        ...cartItems.map(item => ({
+          id: item.product.id,
+          price: item.product.price,
+          quantity: item.quantity,
+          name: item.product.name,
+        })),
+        {
+          id: 'SHIPPING',
+          price: shippingCost,
+          quantity: 1,
+          name: 'Biaya Pengiriman',
+        },
+      ]
+
+      const res = await axios.post<MidtransResponse>('/api/payments/midtrans', {
         shipping_address: shippingAddress,
         total_amount: grandTotal,
-        items: cartItems.map((item) => ({
-          product_id: item.product.id,
-          quantity: item.quantity,
-          price: item.product.price,
-        })),
+        email: 'user@example.com',
+        items: itemsWithShipping,
       })
 
-      clearCart()
-      toast.success('Order placed successfully!')
-      navigate('/orders')
+      const snapToken = res.data.snapToken
+      // @ts-ignore
+      window.snap.pay(snapToken, {
+        onSuccess: async (result: any) => {
+          try {
+            await axios.post('/api/orders/update-transaction', {
+              order_number: result.order_id,
+              transaction_id: result.transaction_id,
+            })
+            toast.success('Pembayaran berhasil dan disimpan!')
+          } catch {
+            toast.error('Pembayaran berhasil, tapi gagal update transaksi.')
+          }
+          clearCart()
+          navigate('/orders')
+        },
+        onPending: () => toast('Pembayaran sedang diproses.'),
+        onError: () => toast.error('Terjadi kesalahan saat pembayaran.'),
+        onClose: () => console.log('Popup pembayaran ditutup.')
+      })
     } catch (error: any) {
       console.error('Checkout error:', error.response?.data || error.message)
-      toast.error(
-        error.response?.data?.message || 'Failed to place order. Please try again.'
-      )
+      toast.error(error.response?.data?.message || 'Failed to start payment.')
     } finally {
       setLoading(false)
     }
   }
 
-  if (cartItems.length === 0) {
+  if (!cartItems || cartItems.length === 0) {
     return (
       <div className="container py-8">
         <div className="text-center py-12">
@@ -112,10 +186,9 @@ export const Checkout = () => {
   return (
     <div className="container py-8">
       <h1 className="text-3xl font-bold mb-8">Checkout</h1>
-
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Shipping Information */}
+          {/* 📦 Form alamat pengiriman */}
           <div className="lg:col-span-2 space-y-6">
             <Card>
               <CardHeader>
@@ -125,69 +198,71 @@ export const Checkout = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="full_name">Full Name *</Label>
-                    <Input
-                      id="full_name"
+                    <Input id="full_name"
                       value={shippingAddress.full_name}
-                      onChange={(e) => handleInputChange('full_name', e.target.value)}
-                      required
-                    />
+                      onChange={e => handleInputChange('full_name', e.target.value)} />
                   </div>
                   <div>
                     <Label htmlFor="phone">Phone Number *</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
+                    <Input id="phone"
                       value={shippingAddress.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
-                      required
-                    />
+                      onChange={e => handleInputChange('phone', e.target.value)} />
                   </div>
+                </div>
+                <div>
+                  <Label htmlFor="address">Address *</Label>
+                  <Input id="address"
+                    value={shippingAddress.address}
+                    onChange={e => handleInputChange('address', e.target.value)} />
+                </div>
+
+                {/* Provinsi dropdown */}
+                <div>
+                  <Label htmlFor="province">Provinsi *</Label>
+                  <select
+                    id="province"
+                    className="border rounded-md p-2 w-full"
+                    value={shippingAddress.province}
+                    onChange={(e) => handleProvinceChange(e.target.value)}
+                  >
+                    <option value="">Pilih Provinsi</option>
+                    {provinces.map((p) => (
+                      <option key={p.code} value={p.code}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Kabupaten dropdown */}
+                <div>
+                  <Label htmlFor="city">Kabupaten/Kota *</Label>
+                  <select
+                    id="city"
+                    className="border rounded-md p-2 w-full"
+                    value={shippingAddress.city}
+                    onChange={(e) => handleInputChange('city', e.target.value)}
+                  >
+                    <option value="">Pilih Kabupaten/Kota</option>
+                    {regencies.map((k) => (
+                      <option key={k.code} value={k.name}>
+                        {k.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>
-                  <Label htmlFor="address">Address *</Label>
-                  <Input
-                    id="address"
-                    value={shippingAddress.address}
-                    onChange={(e) => handleInputChange('address', e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="city">City *</Label>
-                    <Input
-                      id="city"
-                      value={shippingAddress.city}
-                      onChange={(e) => handleInputChange('city', e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="postal_code">Postal Code *</Label>
-                    <Input
-                      id="postal_code"
-                      value={shippingAddress.postal_code}
-                      onChange={(e) => handleInputChange('postal_code', e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="province">Province *</Label>
-                    <Input
-                      id="province"
-                      value={shippingAddress.province}
-                      onChange={(e) => handleInputChange('province', e.target.value)}
-                      required
-                    />
-                  </div>
+                  <Label htmlFor="postal_code">Postal Code *</Label>
+                  <Input id="postal_code"
+                    value={shippingAddress.postal_code}
+                    onChange={e => handleInputChange('postal_code', e.target.value)} />
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Order Summary */}
+          {/* 💳 Ringkasan order */}
           <div className="lg:col-span-1">
             <Card className="sticky top-4">
               <CardHeader>
@@ -195,36 +270,29 @@ export const Checkout = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  {cartItems.map((item) => (
+                  {cartItems.map(item => (
                     <div key={item.id} className="flex justify-between text-sm">
-                      <span className="truncate mr-2">
-                        {item.product.name} × {item.quantity}
-                      </span>
+                      <span>{item.product.name} × {item.quantity}</span>
                       <span>{formatPrice(item.product.price * item.quantity)}</span>
                     </div>
                   ))}
                 </div>
-
                 <Separator />
-
                 <div className="flex justify-between">
                   <span>Subtotal</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping</span>
-                  <span>{formatPrice(shipping)}</span>
+                  <span>{formatPrice(shippingCost)}</span>
                 </div>
-
                 <Separator />
-
                 <div className="flex justify-between font-semibold text-lg">
                   <span>Total</span>
                   <span>{formatPrice(grandTotal)}</span>
                 </div>
-
-                <Button type="submit" className="w-full" size="lg" disabled={loading}>
-                  {loading ? 'Processing...' : 'Place Order'}
+                <Button type="submit" className="w-full mt-4" disabled={loading}>
+                  {loading ? 'Processing…' : 'Pay Now'}
                 </Button>
               </CardContent>
             </Card>
