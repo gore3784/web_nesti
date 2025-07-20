@@ -144,17 +144,30 @@ export const Checkout = () => {
       window.snap.pay(snapToken, {
         onSuccess: async (result: any) => {
           try {
+            // update transaksi
             await axios.post('/api/orders/update-transaction', {
               order_number: result.order_id,
               transaction_id: result.transaction_id,
-            })
-            toast.success('Pembayaran berhasil dan disimpan!')
-          } catch {
-            toast.error('Pembayaran berhasil, tapi gagal update transaksi.')
+            });
+
+            // ✅ kurangi stok produk
+            await axios.post('/api/products/decrease-stock', {
+              items: cartItems.map(item => ({
+                id: item.product.id,
+                quantity: item.quantity,
+              })),
+            });
+
+            toast.success('Pembayaran berhasil, stok diperbarui!');
+          } catch (err) {
+            console.error(err);
+            toast.error('Pembayaran berhasil, tapi gagal update transaksi atau stok.');
           }
-          clearCart()
-          navigate('/orders')
+
+          clearCart();
+          navigate('/orders');
         },
+
         onPending: () => toast('Pembayaran sedang diproses.'),
         onError: () => toast.error('Terjadi kesalahan saat pembayaran.'),
         onClose: () => console.log('Popup pembayaran ditutup.')

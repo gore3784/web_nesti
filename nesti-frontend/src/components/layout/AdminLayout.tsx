@@ -6,7 +6,6 @@ import {
   Users, 
   ShoppingBag, 
   Tags, 
-  Settings,
   Menu,
   X,
   LogOut,
@@ -18,11 +17,10 @@ import { cn } from '@/lib/utils';
 
 const sidebarItems = [
   { name: 'Dashboard', href: '/admin', icon: LayoutDashboard, exact: true },
-  { name: 'Products', href: '/admin/products', icon: Package },
   { name: 'Categories', href: '/admin/categories', icon: Tags },
+  { name: 'Products', href: '/admin/products', icon: Package },
   { name: 'Orders', href: '/admin/orders', icon: ShoppingBag },
   { name: 'Users', href: '/admin/users', icon: Users },
-  { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
 export const AdminLayout = () => {

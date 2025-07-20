@@ -34,6 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::apiResource('categories', CategoryController::class);
 Route::apiResource('products', ProductController::class);
 Route::get('/products/slug/{slug}', [ProductController::class, 'showBySlug']);
+Route::post('/products/decrease-stock', [ProductController::class, 'decreaseStock']);
 
 // =========================
 // 👤 Profile
@@ -64,6 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/orders', [OrderController::class, 'adminIndex']);
     Route::put('/admin/orders/{id}/status', [OrderController::class, 'updateStatus']);
+    Route::get('/admin/orders/{id}', [OrderController::class, 'adminShow']);
 });
 
 Route::middleware('auth:sanctum')->prefix('admin')->group(function () {

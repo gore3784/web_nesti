@@ -1,11 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { HeartIcon, ShoppingCartIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
+import {
+  HeartIcon,
+  ShoppingCartIcon,
+  MinusIcon,
+  PlusIcon,
+} from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Product } from '@/types';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Product, Category } from '@/types';
 import { useStore } from '@/store/useStore';
 import { toast } from 'sonner';
 
@@ -13,15 +24,20 @@ export const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [isImageOpen, setIsImageOpen] = useState(false); // ✅ untuk popup gambar
 
-  const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } = useStore();
+  const { addToCart, addToWishlist, removeFromWishlist, isInWishlist } =
+    useStore();
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/products/slug/${slug}`);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/products/slug/${slug}`
+        );
         if (!res.ok) throw new Error('Product not found');
         const data = await res.json();
         setProduct(data);
@@ -34,6 +50,21 @@ export const ProductDetail = () => {
     };
     if (slug) fetchProduct();
   }, [slug]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/categories`);
+        if (!res.ok) throw new Error('Categories not found');
+        const data = await res.json();
+        setCategories(data);
+      } catch (err) {
+        console.error(err);
+        setCategories([]);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   if (loading) {
     return (
@@ -68,10 +99,12 @@ export const ProductDetail = () => {
   }
 
   const inWishlist = isInWishlist(product.id);
+
   const handleAddToCart = () => {
     addToCart(product, quantity);
     toast.success(`${quantity} × ${product.name} added to cart!`);
   };
+
   const handleWishlistToggle = () => {
     if (inWishlist) {
       removeFromWishlist(product.id);
@@ -81,6 +114,7 @@ export const ProductDetail = () => {
       toast.success(`${product.name} added to wishlist!`);
     }
   };
+
   const formatPrice = (price: number) =>
     new Intl.NumberFormat('id-ID', {
       style: 'currency',
@@ -93,6 +127,7 @@ export const ProductDetail = () => {
       setQuantity(quantity + 1);
     }
   };
+
   const decreaseQuantity = () => {
     if (quantity > 1) {
       setQuantity(quantity - 1);
@@ -104,7 +139,10 @@ export const ProductDetail = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Product Image */}
         <div className="space-y-4">
-          <div className="relative">
+          <div
+            className="relative cursor-pointer"
+            onClick={() => setIsImageOpen(true)}
+          >
             <img
               src={product.image}
               alt={product.name}
@@ -121,6 +159,22 @@ export const ProductDetail = () => {
               </Badge>
             )}
           </div>
+
+          {/* ✅ Dialog popup untuk gambar besar */}
+          <Dialog open={isImageOpen} onOpenChange={setIsImageOpen}>
+            <DialogContent className="max-w-5xl">
+              <DialogHeader>
+                <DialogTitle>{product.name}</DialogTitle>
+              </DialogHeader>
+              <div className="flex justify-center items-center">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="max-h-[80vh] object-contain rounded-lg"
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Product Info */}
@@ -135,7 +189,9 @@ export const ProductDetail = () => {
           <div className="space-y-4">
             <div>
               <h3 className="font-semibold mb-2">Description</h3>
-              <p className="text-muted-foreground leading-relaxed">{product.description}</p>
+              <p className="text-muted-foreground leading-relaxed">
+                {product.description}
+              </p>
             </div>
 
             <div className="flex items-center space-x-4">
@@ -158,7 +214,9 @@ export const ProductDetail = () => {
                 >
                   <MinusIcon className="h-4 w-4" />
                 </Button>
-                <span className="px-4 py-2 border rounded text-center min-w-[60px]">{quantity}</span>
+                <span className="px-4 py-2 border rounded text-center min-w-[60px]">
+                  {quantity}
+                </span>
                 <Button
                   variant="outline"
                   size="sm"
@@ -209,20 +267,22 @@ export const ProductDetail = () => {
               <h3 className="font-semibold mb-4">Product Details</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">ID:</span>
-                  <span>{product.id}</span>
+                  <span className="text-muted-foreground">Slug:</span>
+                  <span>{product.slug}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Availability:</span>
                   <span
-                    className={product.stock > 0 ? 'text-green-600' : 'text-red-600'}
+                    className={
+                      product.stock > 0 ? 'text-green-600' : 'text-red-600'
+                    }
                   >
                     {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Category:</span>
-                  <span>{product.category_id}</span>
+                  <span>{categories.find((c) => c.id === product.category_id)?.name}</span>
                 </div>
               </div>
             </CardContent>

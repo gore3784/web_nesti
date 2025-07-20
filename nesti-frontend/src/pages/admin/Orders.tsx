@@ -37,6 +37,9 @@ export const AdminOrders = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   const loadOrders = async () => {
     try {
       const res = await axios.get<Order[]>('/api/admin/orders');
@@ -53,15 +56,32 @@ export const AdminOrders = () => {
     loadOrders();
   }, []);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
+
   const filteredOrders = orders.filter((order) => {
     const matchesSearch =
       order.id.toString().includes(searchTerm) ||
-      order.shipping_address.full_name
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+      (order.shipping_address?.full_name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ?? false);
+    const matchesStatus =
+      statusFilter === 'all' || order.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+  const paginatedOrders = filteredOrders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -114,21 +134,24 @@ export const AdminOrders = () => {
       minute: '2-digit',
     });
 
-  const handleViewOrder = (order: Order) => {
-    setSelectedOrder(order);
-    setIsDialogOpen(true);
+  const handleViewOrder = async (order: Order) => {
+    try {
+      const res = await axios.get<Order>(`/api/admin/orders/${order.id}`);
+      setSelectedOrder(res.data);
+      setIsDialogOpen(true);
+    } catch (err: any) {
+      toast.error('Gagal memuat detail order');
+    }
   };
 
-  const handleStatusChange = async (orderId: string, newStatus: Order['status']) => {
+  const handleStatusChange = async (orderId: number, newStatus: Order['status']) => {
     try {
       await axios.put(`/api/admin/orders/${orderId}/status`, {
         status: newStatus,
       });
       toast.success('Order status updated');
       setOrders((prev) =>
-        prev.map((o) =>
-          o.id === orderId ? { ...o, status: newStatus } : o
-        )
+        prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
       );
     } catch (err: any) {
       console.error('Update status error', err.response?.data || err.message);
@@ -178,6 +201,7 @@ export const AdminOrders = () => {
             </div>
           </div>
         </CardHeader>
+
         <CardContent>
           <Table>
             <TableHeader>
@@ -192,27 +216,21 @@ export const AdminOrders = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredOrders.map((order) => (
+              {paginatedOrders.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell>
                     <code className="font-mono">#{order.id}</code>
                   </TableCell>
                   <TableCell>
-                    <p className="font-medium">
-                      {order.shipping_address.full_name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {order.shipping_address.phone}
-                    </p>
+                    <p className="font-medium">{order.shipping_address?.full_name ?? '-'}</p>
+                    <p className="text-sm text-muted-foreground">{order.shipping_address?.phone ?? '-'}</p>
                   </TableCell>
                   <TableCell>{formatDate(order.created_at)}</TableCell>
                   <TableCell>{formatPrice(order.total_amount)}</TableCell>
                   <TableCell>
                     <Select
                       value={order.status}
-                      onValueChange={(val) =>
-                        handleStatusChange(order.id as any, val as Order['status'])
-                      }
+                      onValueChange={(val) => handleStatusChange(order.id, val as Order['status'])}
                     >
                       <SelectTrigger className="w-[130px]">
                         {getStatusBadge(order.status)}
@@ -226,23 +244,47 @@ export const AdminOrders = () => {
                       </SelectContent>
                     </Select>
                   </TableCell>
-                  {/* Payment status dari Midtrans */}
+                  <TableCell>{getPaymentBadge(order.payment_status)}</TableCell>
                   <TableCell>
-                    {getPaymentBadge(order.payment_status)}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleViewOrder(order)}
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => handleViewOrder(order)}>
                       <Eye className="h-4 w-4" />
                     </Button>
                   </TableCell>
                 </TableRow>
               ))}
+              {paginatedOrders.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center text-muted-foreground">
+                    No orders found.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
+
+          <div className="flex justify-between items-center mt-4">
+            <Button variant="outline" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>
+              Previous
+            </Button>
+            <div className="space-x-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? 'default' : 'outline'}
+                  onClick={() => goToPage(page)}
+                >
+                  {page}
+                </Button>
+              ))}
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
@@ -250,11 +292,9 @@ export const AdminOrders = () => {
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>
-              Order Details&nbsp;
-              {selectedOrder && <span className="font-mono">#{selectedOrder.id}</span>}
+              Order Details {selectedOrder && <span className="font-mono">#{selectedOrder.id}</span>}
             </DialogTitle>
           </DialogHeader>
-
           {selectedOrder ? (
             <div className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -300,7 +340,7 @@ export const AdminOrders = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {selectedOrder.order_items?.length ? (
+                      {selectedOrder?.order_items && selectedOrder.order_items.length > 0 ? (
                         selectedOrder.order_items.map((item: OrderItem) => (
                           <TableRow key={item.id}>
                             <TableCell>
@@ -320,9 +360,7 @@ export const AdminOrders = () => {
                             </TableCell>
                             <TableCell>{item.quantity}</TableCell>
                             <TableCell>{formatPrice(item.product.price)}</TableCell>
-                            <TableCell className="font-medium">
-                              {formatPrice(item.price)}
-                            </TableCell>
+                            <TableCell className="font-medium">{formatPrice(item.price)}</TableCell>
                           </TableRow>
                         ))
                       ) : (

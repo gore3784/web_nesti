@@ -12,7 +12,6 @@ import type { User } from '@/types';
 interface UserWithStats extends User {
   orders_count: number;
   total_spent: number;
-  status: 'active' | 'inactive';
 }
 
 export const AdminUsers = () => {
@@ -68,8 +67,6 @@ export const AdminUsers = () => {
 
   // 📊 Statistik
   const totalUsers = users.length;
-  const activeUsers = users.filter((u) => u.status === 'active').length;
-  const totalRevenue = users.reduce((sum, u) => sum + u.total_spent, 0);
   const totalOrders = users.reduce((sum, u) => sum + u.orders_count, 0);
 
   return (
@@ -93,31 +90,11 @@ export const AdminUsers = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-            <UserCheck className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{activeUsers}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
             <UserCheck className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalOrders}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <UserCheck className="h-4 w-4 text-orange-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatPrice(totalRevenue)}</div>
           </CardContent>
         </Card>
       </div>
@@ -148,7 +125,6 @@ export const AdminUsers = () => {
                   <TableHead>Joined</TableHead>
                   <TableHead>Orders</TableHead>
                   <TableHead>Total Spent</TableHead>
-                  <TableHead>Status</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -168,7 +144,6 @@ export const AdminUsers = () => {
                       <Badge variant="outline">{user.orders_count}</Badge>
                     </TableCell>
                     <TableCell>{formatPrice(user.total_spent)}</TableCell>
-                    <TableCell>{getStatusBadge(user.status)}</TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
                         <Button variant="ghost" size="sm">

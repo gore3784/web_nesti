@@ -65,14 +65,17 @@ export const Products = () => {
 
     if (priceRange !== 'all') {
       switch (priceRange) {
-        case 'under-100k':
-          filtered = filtered.filter((p) => p.price < 100000);
+        case 'under-500k':
+          filtered = filtered.filter((p) => p.price < 500000);
           break;
-        case '100k-500k':
-          filtered = filtered.filter((p) => p.price >= 100000 && p.price <= 500000);
+        case '500k-1m':
+          filtered = filtered.filter((p) => p.price >= 500000 && p.price <= 1000000);
           break;
-        case 'over-500k':
-          filtered = filtered.filter((p) => p.price > 500000);
+        case '1m-5m':
+          filtered = filtered.filter((p) => p.price >= 1000000 && p.price <= 5000000);
+          break;
+        case 'over-5m':
+          filtered = filtered.filter((p) => p.price > 5000000);
           break;
       }
     }
@@ -139,10 +142,10 @@ export const Products = () => {
           onValueChange={(value) => setSelectedCategory(value === 'all' ? null : value)}
         >
           <SelectTrigger>
-            <SelectValue placeholder="All Categories" />
+            <SelectValue placeholder="Semua Kategori" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
+            <SelectItem value="all">Semua Kategori</SelectItem>
             {categories.map((category) => (
               <SelectItem key={category.id} value={category.id.toString()}>
                 {category.name}
@@ -154,29 +157,32 @@ export const Products = () => {
         {/* Price Range */}
         <Select value={priceRange} onValueChange={setPriceRange}>
           <SelectTrigger>
-            <SelectValue placeholder="Price Range" />
+            <SelectValue placeholder="Harga" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Prices</SelectItem>
-            <SelectItem value="under-100k">Under {formatPrice(100000)}</SelectItem>
-            <SelectItem value="100k-500k">
-              {formatPrice(100000)} - {formatPrice(500000)}
+            <SelectItem value="all">Semua Harga</SelectItem>
+            <SelectItem value="under-500k">Dibawah {formatPrice(500000)}</SelectItem>
+            <SelectItem value="500k-1m">
+              {formatPrice(500000)} - {formatPrice(1000000)}
             </SelectItem>
-            <SelectItem value="over-500k">Over {formatPrice(500000)}</SelectItem>
+            <SelectItem value="1m-5m">
+              {formatPrice(1000000)} - {formatPrice(5000000)}
+            </SelectItem>
+            <SelectItem value="over-5m">Diatas {formatPrice(5000000)}</SelectItem>
           </SelectContent>
         </Select>
 
         {/* Sort */}
         <Select value={sortBy} onValueChange={setSortBy}>
           <SelectTrigger>
-            <SelectValue placeholder="Sort by" />
+            <SelectValue placeholder="Urutkan" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="newest">Newest</SelectItem>
-            <SelectItem value="price-low">Price: Low to High</SelectItem>
-            <SelectItem value="price-high">Price: High to Low</SelectItem>
-            <SelectItem value="name">Name: A to Z</SelectItem>
-            <SelectItem value="stock">Stock: High to Low</SelectItem>
+            <SelectItem value="newest">Terbaru</SelectItem>
+            <SelectItem value="price-low">Harga: Rendah to Tinggi</SelectItem>
+            <SelectItem value="price-high">Harga: Tinggi to Rendah</SelectItem>
+            <SelectItem value="name">Nama: A to Z</SelectItem>
+            <SelectItem value="stock">Stock: Tinggi to Rendah</SelectItem>
           </SelectContent>
         </Select>
       </div>

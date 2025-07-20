@@ -138,7 +138,7 @@ export const Orders = () => {
                   <CalendarIcon className="h-4 w-4" />
                   {formatDate(order.created_at)}
                 </span>
-                <span>{order.items.length} items</span>
+                <span>{order.order_items?.length ?? 0} items</span>
                 {getPaymentBadge(order.payment_status)}
               </CardDescription>
             </div>
@@ -229,10 +229,10 @@ export const Orders = () => {
               {/* Items */}
               <div className="space-y-2">
                 <h4 className="font-medium">Items</h4>
-                {selectedOrder.items.map((item) => (
+                {selectedOrder?.order_items?.map((item) => (
                   <div key={item.id} className="flex justify-between text-sm">
                     <span>
-                      {item.product.name} × {item.quantity}
+                      {item.product?.name} × {item.quantity}
                     </span>
                     <span>{formatPrice(item.price * item.quantity)}</span>
                   </div>
@@ -243,28 +243,18 @@ export const Orders = () => {
 
               {/* Totals */}
               {(() => {
-                // Hitung shipping dari provinsi atau aturan lain
-                const shippingCost =
-                  selectedOrder.shipping_address.province.toLowerCase().includes('ntt')
-                    ? 50000
-                    : 100000
-                const grandTotal = selectedOrder.total_amount + shippingCost
+                const grandTotal = selectedOrder.total_amount
                 return (
-                  <>
+                  <div className="border p-3 rounded-md">
                     <div className="flex justify-between text-sm">
-                      <span>Subtotal</span>
-                      <span>{formatPrice(selectedOrder.total_amount)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Shipping</span>
-                      <span>{formatPrice(shippingCost)}</span>
+                      <span>Setelah dihtiung dengan biaya Shipping</span>
                     </div>
                     <Separator />
                     <div className="flex justify-between font-semibold">
                       <span>Total</span>
                       <span>{formatPrice(grandTotal)}</span>
                     </div>
-                  </>
+                  </div>
                 )
               })()}
             </div>

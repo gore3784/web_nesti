@@ -69,8 +69,8 @@ class OrderController extends Controller
 
             return response()->json([
                 'message' => 'Order created successfully',
-                'order_id' => $order->id,            // ID integer
-                'order_number' => $order->order_number,  // kirim juga ke frontend
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
                 'status' => $order->status,
             ], 201);
         });
@@ -83,7 +83,7 @@ class OrderController extends Controller
     {
         $user = $request->user();
 
-        $orders = Order::with(['items.product', 'shippingAddress'])
+        $orders = Order::with(['order_items.product', 'shipping_address'])
             ->where('user_id', $user->id)
             ->latest()
             ->get();
@@ -96,11 +96,11 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        $user = Auth::user();
+        $order = Order::with(['order_items.product', 'shipping_address'])->find($id);
 
-        $order = Order::with(['items.product', 'shippingAddress'])
-            ->where('user_id', $user->id)
-            ->findOrFail($id);
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
 
         return response()->json($order);
     }
@@ -114,7 +114,7 @@ class OrderController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $orders = Order::with(['items.product', 'shippingAddress'])
+        $orders = Order::with(['order_items.product', 'shipping_address'])
             ->latest()
             ->get();
 
@@ -144,4 +144,20 @@ class OrderController extends Controller
             'status' => $order->status,
         ]);
     }
+
+    public function adminShow($id)
+    {
+        if (!Auth::check() || Auth::user()->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $order = Order::with(['order_items.product', 'shipping_address'])->find($id);
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        return response()->json($order);
+    }
+
 }

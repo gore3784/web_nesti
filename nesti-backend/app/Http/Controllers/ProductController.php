@@ -118,4 +118,19 @@ class ProductController extends Controller
         return response()->json($product);
     }
 
+    public function decreaseStock(Request $request)
+    {
+        $items = $request->input('items', []);
+
+        foreach ($items as $item) {
+            $product = Product::find($item['id']); // ✅ ambil single model
+            if ($product) {
+                $product->stock = max($product->stock - $item['quantity'], 0);
+                $product->save();
+            }
+        }
+
+        return response()->json(['message' => 'Stock updated']);
+    }
+
 }

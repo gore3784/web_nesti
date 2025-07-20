@@ -72,7 +72,7 @@ export const Categories = () => {
       </div>
 
       {/* Featured Categories Section */}
-      <div className="mt-16">
+      {/* <div className="mt-16">
         <h2 className="text-2xl font-bold mb-6">Popular Categories</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {categories.slice(0, 4).map((category) => (
@@ -102,7 +102,7 @@ export const Categories = () => {
             </Link>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

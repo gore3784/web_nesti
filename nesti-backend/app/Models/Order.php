@@ -10,10 +10,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $status
  * @property string|null $transaction_id
  */
-
 class Order extends Model
 {
-    // Kolom yang boleh diisi mass-assignment
     protected $fillable = [
         'user_id',
         'shipping_address_id',
@@ -32,13 +30,13 @@ class Order extends Model
     }
 
     // Relasi ke alamat pengiriman
-    public function shippingAddress()
+    public function shipping_address()
     {
         return $this->belongsTo(ShippingAddress::class, 'shipping_address_id');
     }
 
-    // Relasi ke item-item order
-    public function items()
+    // Relasi ke item-item order (pakai satu nama saja)
+    public function order_items()
     {
         return $this->hasMany(OrderItem::class);
     }
