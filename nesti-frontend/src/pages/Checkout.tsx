@@ -26,7 +26,6 @@ export const Checkout = () => {
   const [loading, setLoading] = useState(false)
   const [snapReady, setSnapReady] = useState(false)
 
-  // data wilayah
   const [provinces, setProvinces] = useState<WilayahItem[]>([])
   const [regencies, setRegencies] = useState<WilayahItem[]>([])
 
@@ -50,7 +49,7 @@ export const Checkout = () => {
         setProvinces(json.data)
       } catch (err) {
         console.error('Fetch provinces error:', err)
-        toast.error('Gagal memuat provinsi')
+        toast.error('Gagal memuat daftar provinsi.')
       }
     }
 
@@ -67,14 +66,13 @@ export const Checkout = () => {
     fetch(`http://localhost:8000/api/proxy/regencies/${provCode}`)
       .then(res => res.json())
       .then(json => setRegencies(json.data))
-      .catch(() => toast.error('Gagal memuat kabupaten/kota'))
+      .catch(() => toast.error('Gagal memuat daftar kabupaten/kota.'))
   }
 
   const handleInputChange = (field: keyof ShippingAddress, value: string) => {
     setShippingAddress(prev => ({ ...prev, [field]: value }))
   }
 
-  // hitung total
   const subtotal = getCartTotal()
   const shippingCost = shippingAddress.province === '53' ? 50000 : 100000
   const grandTotal = subtotal + shippingCost
@@ -99,24 +97,23 @@ export const Checkout = () => {
     ]
     for (const field of required) {
       if (!shippingAddress[field]?.toString().trim()) {
-        toast.error(`Please fill in ${field.replace('_', ' ')}`)
+        toast.error(`Harap lengkapi ${field.replace('_', ' ')}`)
         return
       }
     }
 
     if (cartItems.length === 0) {
-      toast.error('Your cart is empty.')
+      toast.error('Keranjang Anda kosong.')
       return
     }
 
     if (!snapReady) {
-      toast.error('Payment system not ready. Snap JS belum termuat.')
+      toast.error('Sistem pembayaran belum siap. Snap JS belum termuat.')
       return
     }
 
     setLoading(true)
     try {
-      // 👉 gabungkan items barang dengan shipping sebagai item baru
       const itemsWithShipping = [
         ...cartItems.map(item => ({
           id: item.product.id,
@@ -144,13 +141,11 @@ export const Checkout = () => {
       window.snap.pay(snapToken, {
         onSuccess: async (result: any) => {
           try {
-            // update transaksi
             await axios.post('/api/orders/update-transaction', {
               order_number: result.order_id,
               transaction_id: result.transaction_id,
             });
 
-            // ✅ kurangi stok produk
             await axios.post('/api/products/decrease-stock', {
               items: cartItems.map(item => ({
                 id: item.product.id,
@@ -158,10 +153,10 @@ export const Checkout = () => {
               })),
             });
 
-            toast.success('Pembayaran berhasil, stok diperbarui!');
+            toast.success('Pembayaran berhasil, stok telah diperbarui!');
           } catch (err) {
             console.error(err);
-            toast.error('Pembayaran berhasil, tapi gagal update transaksi atau stok.');
+            toast.error('Pembayaran berhasil, tetapi gagal memperbarui transaksi atau stok.');
           }
 
           clearCart();
@@ -174,7 +169,7 @@ export const Checkout = () => {
       })
     } catch (error: any) {
       console.error('Checkout error:', error.response?.data || error.message)
-      toast.error(error.response?.data?.message || 'Failed to start payment.')
+      toast.error(error.response?.data?.message || 'Gagal memulai pembayaran.')
     } finally {
       setLoading(false)
     }
@@ -184,12 +179,12 @@ export const Checkout = () => {
     return (
       <div className="container py-8">
         <div className="text-center py-12">
-          <h1 className="text-3xl font-bold mb-4">No Items to Checkout</h1>
+          <h1 className="text-3xl font-bold mb-4">Tidak Ada Barang untuk Checkout</h1>
           <p className="text-muted-foreground mb-8">
-            Your cart is empty. Add some items to proceed with checkout.
+            Keranjang Anda kosong. Tambahkan barang terlebih dahulu untuk melanjutkan ke checkout.
           </p>
           <Button asChild size="lg">
-            <Link to="/products">Start Shopping</Link>
+            <Link to="/products">Mulai Belanja</Link>
           </Button>
         </div>
       </div>
@@ -205,31 +200,30 @@ export const Checkout = () => {
           <div className="lg:col-span-2 space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Shipping Information</CardTitle>
+                <CardTitle>Informasi Pengiriman</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="full_name">Full Name *</Label>
+                    <Label htmlFor="full_name">Nama Lengkap *</Label>
                     <Input id="full_name"
                       value={shippingAddress.full_name}
                       onChange={e => handleInputChange('full_name', e.target.value)} />
                   </div>
                   <div>
-                    <Label htmlFor="phone">Phone Number *</Label>
+                    <Label htmlFor="phone">Nomor Telepon *</Label>
                     <Input id="phone"
                       value={shippingAddress.phone}
                       onChange={e => handleInputChange('phone', e.target.value)} />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="address">Address *</Label>
+                  <Label htmlFor="address">Alamat *</Label>
                   <Input id="address"
                     value={shippingAddress.address}
                     onChange={e => handleInputChange('address', e.target.value)} />
                 </div>
 
-                {/* Provinsi dropdown */}
                 <div>
                   <Label htmlFor="province">Provinsi *</Label>
                   <select
@@ -247,7 +241,6 @@ export const Checkout = () => {
                   </select>
                 </div>
 
-                {/* Kabupaten dropdown */}
                 <div>
                   <Label htmlFor="city">Kabupaten/Kota *</Label>
                   <select
@@ -266,7 +259,7 @@ export const Checkout = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="postal_code">Postal Code *</Label>
+                  <Label htmlFor="postal_code">Kode Pos *</Label>
                   <Input id="postal_code"
                     value={shippingAddress.postal_code}
                     onChange={e => handleInputChange('postal_code', e.target.value)} />
@@ -279,7 +272,7 @@ export const Checkout = () => {
           <div className="lg:col-span-1">
             <Card className="sticky top-4">
               <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
+                <CardTitle>Ringkasan Pesanan</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -296,7 +289,7 @@ export const Checkout = () => {
                   <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Shipping</span>
+                  <span>Biaya Pengiriman</span>
                   <span>{formatPrice(shippingCost)}</span>
                 </div>
                 <Separator />
@@ -305,7 +298,7 @@ export const Checkout = () => {
                   <span>{formatPrice(grandTotal)}</span>
                 </div>
                 <Button type="submit" className="w-full mt-4" disabled={loading}>
-                  {loading ? 'Processing…' : 'Pay Now'}
+                  {loading ? 'Memproses…' : 'Bayar Sekarang'}
                 </Button>
               </CardContent>
             </Card>

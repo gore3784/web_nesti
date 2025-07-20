@@ -103,12 +103,12 @@ export const AdminCategories = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Categories</h1>
-          <p className="text-muted-foreground">Manage product categories</p>
+          <h1 className="text-3xl font-bold">Kategori</h1>
+          <p className="text-muted-foreground">Kelola kategori produk</p>
         </div>
         <Button onClick={handleAddCategory}>
           <Plus className="h-4 w-4 mr-2" />
-          Add Category
+          Tambah Kategori
         </Button>
       </div>
 
@@ -129,11 +129,11 @@ export const AdminCategories = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Products</TableHead>
+                <TableHead>Nama</TableHead>
+                <TableHead>Deskripsi</TableHead>
+                <TableHead>Produk</TableHead>
                 <TableHead>Slug</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -187,27 +187,27 @@ export const AdminCategories = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingCategory ? 'Edit Category' : 'Add New Category'}
+              {editingCategory ? 'Edit Kategori' : 'Tambah Kategori'}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSaveCategory} className="space-y-4">
             <div>
-              <Label htmlFor="name">Category Name</Label>
+              <Label htmlFor="name">Nama Kategori</Label>
               <Input
                 id="name"
                 name="name"
                 defaultValue={editingCategory?.name}
-                placeholder="Enter category name"
+                placeholder="Masukkan nama kategori"
                 required
               />
             </div>
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Deskripsi</Label>
               <Textarea
                 id="description"
                 name="description"
                 defaultValue={editingCategory?.description}
-                placeholder="Enter category description"
+                placeholder="Masukkan deskripsi kategori"
               />
             </div>
             <div className="flex justify-end space-x-2">
@@ -219,7 +219,7 @@ export const AdminCategories = () => {
                 Cancel
               </Button>
               <Button type="submit">
-                {editingCategory ? 'Update Category' : 'Add Category'}
+                {editingCategory ? 'Update Kategori' : 'Tambah Kategori'}
               </Button>
             </div>
           </form>

@@ -63,7 +63,7 @@ export const AdminLayout = () => {
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-sm">A</span>
               </div>
-              <h1 className="text-lg font-semibold">Admin Panel</h1>
+              <h1 className="text-lg font-semibold">Hinggi.id Admin</h1>
             </div>
             <Button
               variant="ghost"
@@ -102,7 +102,7 @@ export const AdminLayout = () => {
             <Button variant="outline" size="sm" asChild className="w-full">
               <Link to="/">
                 <Home className="h-4 w-4 mr-2" />
-                Back to Store
+                Kembali ke Toko
               </Link>
             </Button>
             
@@ -138,7 +138,7 @@ export const AdminLayout = () => {
                 {location.pathname.split('/').pop() || 'Dashboard'}
               </h2>
               <p className="text-sm text-muted-foreground">
-                Welcome back, {user?.full_name || 'Admin'}
+                Selamat datang, {user?.full_name || 'Admin'}
               </p>
             </div>
           </div>

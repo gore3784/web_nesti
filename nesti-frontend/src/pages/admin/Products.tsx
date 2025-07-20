@@ -73,7 +73,7 @@ export const AdminProducts = () => {
       price: Number(formData.get('price')),
       stock: Number(formData.get('stock')),
       image: formData.get('image') as string,
-      featured: formData.get('featured') ? true : false, // ✅ ambil dari checkbox
+      featured: formData.get('featured') ? true : false,
     };
 
     if (editingProduct) {
@@ -117,22 +117,22 @@ export const AdminProducts = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Products</h1>
-          <p className="text-muted-foreground">Manage your product inventory</p>
+          <h1 className="text-3xl font-bold">Produk</h1>
+          <p className="text-muted-foreground">Kelola inventaris produk</p>
         </div>
         <Button onClick={handleAddProduct}>
           <Plus className="h-4 w-4 mr-2" />
-          Add Product
+          Tambah Produk
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Product List</CardTitle>
+          <CardTitle>Daftar Produk</CardTitle>
           <div className="flex items-center space-x-2">
             <Search className="h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search products..."
+              placeholder="Cari produk..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="max-w-sm"
@@ -143,14 +143,14 @@ export const AdminProducts = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Image</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Stock</TableHead>
-                <TableHead>Featured</TableHead>
+                <TableHead>Gambar</TableHead>
+                <TableHead>Nama</TableHead>
+                <TableHead>Kategori</TableHead>
+                <TableHead>Harga</TableHead>
+                <TableHead>Stok</TableHead>
+                <TableHead>Unggulan</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -174,7 +174,7 @@ export const AdminProducts = () => {
                   <TableCell>{getCategoryName(product.category_id.toString())}</TableCell>
                   <TableCell>{formatPrice(product.price)}</TableCell>
                   <TableCell>{product.stock}</TableCell>
-                  <TableCell>{product.featured ? 'Yes' : 'No'}</TableCell>
+                  <TableCell>{product.featured ? 'Ya' : 'Tidak'}</TableCell>
                   <TableCell>{getStockBadge(product.stock)}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
@@ -201,16 +201,16 @@ export const AdminProducts = () => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editingProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
+            <DialogTitle>{editingProduct ? 'Edit Produk' : 'Tambah Produk Baru'}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSaveProduct} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="name">Product Name</Label>
+                <Label htmlFor="name">Nama Produk</Label>
                 <Input id="name" name="name" defaultValue={editingProduct?.name} required />
               </div>
               <div>
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="category">Kategori</Label>
                 <select
                   id="category"
                   name="category"
@@ -228,20 +228,20 @@ export const AdminProducts = () => {
               </div>
             </div>
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Deskripsi</Label>
               <Textarea id="description" name="description" defaultValue={editingProduct?.description} />
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="price">Price (IDR)</Label>
+                <Label htmlFor="price">Harga (IDR)</Label>
                 <Input id="price" name="price" type="number" defaultValue={editingProduct?.price} />
               </div>
               <div>
-                <Label htmlFor="stock">Stock</Label>
+                <Label htmlFor="stock">Stok</Label>
                 <Input id="stock" name="stock" type="number" defaultValue={editingProduct?.stock} />
               </div>
               <div>
-                <Label htmlFor="image">Image URL</Label>
+                <Label htmlFor="image">Gambar</Label>
                 <Input id="image" name="image" defaultValue={editingProduct?.image} />
               </div>
             </div>
@@ -253,13 +253,13 @@ export const AdminProducts = () => {
                 defaultChecked={editingProduct?.featured}
                 className="h-4 w-4"
               />
-              <Label htmlFor="featured">Featured</Label>
+              <Label htmlFor="featured">Unggulan</Label>
             </div>
             <div className="flex justify-end space-x-2">
               <Button variant="outline" type="button" onClick={() => setIsDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit">{editingProduct ? 'Update Product' : 'Add Product'}</Button>
+              <Button type="submit">{editingProduct ? 'Update Produk' : 'Tambah Produk Baru'}</Button>
             </div>
           </form>
         </DialogContent>

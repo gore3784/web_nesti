@@ -86,15 +86,15 @@ export const AdminOrders = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="secondary">Pending</Badge>;
+        return <Badge variant="secondary">Menunggu</Badge>;
       case 'paid':
-        return <Badge variant="default">Paid</Badge>;
+        return <Badge variant="default">Dibayar</Badge>;
       case 'shipped':
-        return <Badge variant="outline">Shipped</Badge>;
+        return <Badge variant="outline">Dikirim</Badge>;
       case 'completed':
-        return <Badge className="bg-green-500">Delivered</Badge>;
+        return <Badge className="bg-green-500">Diterima</Badge>;
       case 'cancelled':
-        return <Badge variant="destructive">Cancelled</Badge>;
+        return <Badge variant="destructive">Dibatalkan</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -103,17 +103,17 @@ export const AdminOrders = () => {
   const getPaymentBadge = (payment_status: string) => {
     switch (payment_status) {
       case 'paid':
-        return <Badge className="bg-green-500">Paid</Badge>;
+        return <Badge className="bg-green-500">Dibayar</Badge>;
       case 'pending':
         return <Badge variant="secondary">Pending</Badge>;
       case 'expired':
-        return <Badge variant="destructive">Expired</Badge>;
+        return <Badge variant="destructive">Kadaluarsa</Badge>;
       case 'cancelled':
-        return <Badge variant="destructive">Cancelled</Badge>;
+        return <Badge variant="destructive">Dibatalkan</Badge>;
       case 'challenge':
         return <Badge variant="outline">Challenge</Badge>;
       case 'denied':
-        return <Badge variant="destructive">Denied</Badge>;
+        return <Badge variant="destructive">Ditolak</Badge>;
       default:
         return <Badge variant="secondary">{payment_status}</Badge>;
     }
@@ -160,24 +160,24 @@ export const AdminOrders = () => {
   };
 
   if (loading) {
-    return <p className="p-6">Loading orders...</p>;
+    return <p className="p-6">Memuat transaksi...</p>;
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Orders</h1>
-        <p className="text-muted-foreground">Manage customer orders</p>
+        <h1 className="text-3xl font-bold">Transaksi</h1>
+        <p className="text-muted-foreground">Kelola transaksi</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Order List</CardTitle>
+          <CardTitle>Daftar Transaksi</CardTitle>
           <div className="flex items-center space-x-4 mt-4">
             <div className="flex items-center space-x-2">
               <Search className="h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search orders..."
+                placeholder="Cari transaksi..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="max-w-sm"
@@ -190,12 +190,12 @@ export const AdminOrders = () => {
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="shipped">Shipped</SelectItem>
-                  <SelectItem value="completed">Delivered</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectItem value="all">Semua Status</SelectItem>
+                  <SelectItem value="pending">Menunggu</SelectItem>
+                  <SelectItem value="paid">Dibayar</SelectItem>
+                  <SelectItem value="shipped">Dikirim</SelectItem>
+                  <SelectItem value="completed">Diterima</SelectItem>
+                  <SelectItem value="cancelled">Dibatalkan</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -206,9 +206,9 @@ export const AdminOrders = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Order ID</TableHead>
+                <TableHead>Transaksi ID</TableHead>
                 <TableHead>Customer</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>Tanggal</TableHead>
                 <TableHead>Total</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Payment</TableHead>
@@ -236,11 +236,11 @@ export const AdminOrders = () => {
                         {getStatusBadge(order.status)}
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="paid">Paid</SelectItem>
-                        <SelectItem value="shipped">Shipped</SelectItem>
-                        <SelectItem value="completed">Delivered</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                        <SelectItem value="pending">Menunggu</SelectItem>
+                        <SelectItem value="paid">Dibayar</SelectItem>
+                        <SelectItem value="shipped">Dikirim</SelectItem>
+                        <SelectItem value="completed">Diterima</SelectItem>
+                        <SelectItem value="cancelled">Dibatalkan</SelectItem>
                       </SelectContent>
                     </Select>
                   </TableCell>
@@ -255,7 +255,7 @@ export const AdminOrders = () => {
               {paginatedOrders.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center text-muted-foreground">
-                    No orders found.
+                    Tidak ada transaksi ditemukan.
                   </TableCell>
                 </TableRow>
               )}
@@ -292,7 +292,7 @@ export const AdminOrders = () => {
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>
-              Order Details {selectedOrder && <span className="font-mono">#{selectedOrder.id}</span>}
+              Detail Transaksi {selectedOrder && <span className="font-mono">#{selectedOrder.id}</span>}
             </DialogTitle>
           </DialogHeader>
           {selectedOrder ? (
@@ -300,26 +300,26 @@ export const AdminOrders = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Customer Information</CardTitle>
+                    <CardTitle>Informasi Pelanggan</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2 text-sm">
-                    <p><strong>Name:</strong> {selectedOrder.shipping_address?.full_name ?? '-'}</p>
-                    <p><strong>Phone:</strong> {selectedOrder.shipping_address?.phone ?? '-'}</p>
-                    <p><strong>Address:</strong> {selectedOrder.shipping_address?.address ?? '-'}</p>
-                    <p><strong>City:</strong> {selectedOrder.shipping_address?.city ?? '-'}</p>
-                    <p><strong>Province:</strong> {selectedOrder.shipping_address?.province ?? '-'}</p>
-                    <p><strong>Postal Code:</strong> {selectedOrder.shipping_address?.postal_code ?? '-'}</p>
+                    <p><strong>Nama:</strong> {selectedOrder.shipping_address?.full_name ?? '-'}</p>
+                    <p><strong>Telepon:</strong> {selectedOrder.shipping_address?.phone ?? '-'}</p>
+                    <p><strong>Alamat:</strong> {selectedOrder.shipping_address?.address ?? '-'}</p>
+                    <p><strong>Kota:</strong> {selectedOrder.shipping_address?.city ?? '-'}</p>
+                    <p><strong>Provinsi:</strong> {selectedOrder.shipping_address?.province ?? '-'}</p>
+                    <p><strong>Kode Pos:</strong> {selectedOrder.shipping_address?.postal_code ?? '-'}</p>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Order Information</CardTitle>
+                    <CardTitle>Informasi Transaksi</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2 text-sm">
-                    <p><strong>Date:</strong> {formatDate(selectedOrder.created_at)}</p>
+                    <p><strong>Tanggal:</strong> {formatDate(selectedOrder.created_at)}</p>
                     <p><strong>Status:</strong> {getStatusBadge(selectedOrder.status)}</p>
-                    <p><strong>Payment:</strong> {getPaymentBadge(selectedOrder.payment_status)}</p>
+                    <p><strong>Pembayaran:</strong> {getPaymentBadge(selectedOrder.payment_status)}</p>
                     <p><strong>Total:</strong> {formatPrice(selectedOrder.total_amount)}</p>
                   </CardContent>
                 </Card>
@@ -327,15 +327,15 @@ export const AdminOrders = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Order Items</CardTitle>
+                  <CardTitle>Item Transaksi</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Product</TableHead>
-                        <TableHead>Quantity</TableHead>
-                        <TableHead>Price</TableHead>
+                        <TableHead>Produk</TableHead>
+                        <TableHead>Jumlah</TableHead>
+                        <TableHead>Harga</TableHead>
                         <TableHead>Total</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -366,7 +366,7 @@ export const AdminOrders = () => {
                       ) : (
                         <TableRow>
                           <TableCell colSpan={4} className="text-center text-muted-foreground">
-                            No items found in this order.
+                            Tidak ada item ditemukan dalam transaksi ini.
                           </TableCell>
                         </TableRow>
                       )}
@@ -376,7 +376,7 @@ export const AdminOrders = () => {
               </Card>
             </div>
           ) : (
-            <p className="text-center text-muted-foreground py-6">No order selected.</p>
+            <p className="text-center text-muted-foreground py-6">Tidak ada transaksi yang dipilih.</p>
           )}
         </DialogContent>
       </Dialog>

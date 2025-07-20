@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   MagnifyingGlassIcon,
   ShoppingCartIcon,
@@ -7,27 +7,27 @@ import {
   UserIcon,
   Bars3Icon,
   XMarkIcon,
-} from '@heroicons/react/24/outline';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useStore } from '@/store/useStore';
-import { Badge } from '@/components/ui/badge';
-import { LogOutIcon, Package, Settings } from 'lucide-react';
-import { LoginModal } from '@/components/auth/LoginModal';
-import { RegisterModal } from '@/components/auth/RegisterModal';
+} from '@heroicons/react/24/outline'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { useStore } from '@/store/useStore'
+import { Badge } from '@/components/ui/badge'
+import { LogOutIcon, Package, Settings } from 'lucide-react'
+import { LoginModal } from '@/components/auth/LoginModal'
+import { RegisterModal } from '@/components/auth/RegisterModal'
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu'
 
 export const Header = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
-  const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [showLoginModal, setShowLoginModal] = useState(false)
+  const [showRegisterModal, setShowRegisterModal] = useState(false)
+  const navigate = useNavigate()
 
   const {
     searchQuery,
@@ -36,33 +36,39 @@ export const Header = () => {
     user,
     wishlistItems,
     setUser,
-  } = useStore();
+  } = useStore()
 
-  const cartItemsCount = getCartItemsCount();
-  const wishlistCount = wishlistItems.length;
+  const cartItemsCount = getCartItemsCount()
+  const wishlistCount = wishlistItems.length
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (searchQuery.trim()) {
-      navigate(`/products?q=${encodeURIComponent(searchQuery.trim())}`);
+      navigate(`/products?q=${encodeURIComponent(searchQuery.trim())}`)
     }
-  };
+  }
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    navigate('/login');
-  };
+    localStorage.removeItem('token')
+    setUser(null)
+    navigate('/login')
+  }
 
+  // switch login -> register
   const handleSwitchToRegister = () => {
-    setShowLoginModal(false);
-    setShowRegisterModal(true);
-  };
+    setShowLoginModal(false)
+    setTimeout(() => {
+      setShowRegisterModal(true)
+    }, 0)
+  }
 
+  // switch register -> login
   const handleSwitchToLogin = () => {
-    setShowRegisterModal(false);
-    setShowLoginModal(true);
-  };
+    setShowRegisterModal(false)
+    setTimeout(() => {
+      setShowLoginModal(true)
+    }, 0)
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -140,7 +146,7 @@ export const Header = () => {
             </Link>
           </Button>
 
-          {/* User Menu Dropdown */}
+          {/* User Menu */}
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -195,11 +201,7 @@ export const Header = () => {
             className="md:hidden"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            {isMobileMenuOpen ? (
-              <XMarkIcon className="h-5 w-5" />
-            ) : (
-              <Bars3Icon className="h-5 w-5" />
-            )}
+            {isMobileMenuOpen ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
           </Button>
         </div>
       </div>
@@ -225,42 +227,22 @@ export const Header = () => {
             </form>
 
             <nav className="flex flex-col space-y-2">
-              <Link
-                to="/"
-                className="text-foreground hover:text-primary transition-colors py-2"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
+              <Link to="/" className="text-foreground hover:text-primary transition-colors py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 Home
               </Link>
-              <Link
-                to="/products"
-                className="text-foreground hover:text-primary transition-colors py-2"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
+              <Link to="/products" className="text-foreground hover:text-primary transition-colors py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 Products
               </Link>
-              <Link
-                to="/categories"
-                className="text-foreground hover:text-primary transition-colors py-2"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
+              <Link to="/categories" className="text-foreground hover:text-primary transition-colors py-2" onClick={() => setIsMobileMenuOpen(false)}>
                 Categories
               </Link>
               {user && (
                 <>
-                  <Link
-                    to="/orders"
-                    className="text-foreground hover:text-primary transition-colors py-2"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
+                  <Link to="/orders" className="text-foreground hover:text-primary transition-colors py-2" onClick={() => setIsMobileMenuOpen(false)}>
                     Order History
                   </Link>
                   {user.role === 'admin' && (
-                    <Link
-                      to="/admin"
-                      className="text-foreground hover:text-primary transition-colors py-2"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
+                    <Link to="/admin" className="text-foreground hover:text-primary transition-colors py-2" onClick={() => setIsMobileMenuOpen(false)}>
                       Admin Panel
                     </Link>
                   )}
@@ -271,6 +253,7 @@ export const Header = () => {
         </div>
       )}
 
+      {/* Modal Components */}
       <LoginModal
         open={showLoginModal}
         onOpenChange={setShowLoginModal}
@@ -283,5 +266,5 @@ export const Header = () => {
         onSwitchToLogin={handleSwitchToLogin}
       />
     </header>
-  );
-};
+  )
+}

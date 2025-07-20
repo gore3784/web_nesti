@@ -30,17 +30,17 @@ export const Register = () => {
     e.preventDefault();
 
     if (!formData.full_name || !formData.email || !formData.password || !formData.confirm_password) {
-      toast.error('Please fill in all fields');
+      toast.error('Harap isi semua kolom');
       return;
     }
 
     if (formData.password !== formData.confirm_password) {
-      toast.error('Passwords do not match');
+      toast.error('Password tidak sama');
       return;
     }
 
     if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters long');
+      toast.error('Password minimal 6 karakter');
       return;
     }
 
@@ -67,7 +67,7 @@ export const Register = () => {
           const messages = Object.values(errorData.errors).flat().join('\n');
           toast.error(messages);
         } else {
-          toast.error(errorData.message || 'Registration failed');
+          toast.error(errorData.message || 'Pendaftaran gagal');
         }
         return;
       }
@@ -87,7 +87,7 @@ export const Register = () => {
       });
 
       if (!loginResponse.ok) {
-        toast.success('Account created! Please login.');
+        toast.success('Akun berhasil dibuat! Silakan login.');
         navigate('/login');
         return;
       }
@@ -106,12 +106,12 @@ export const Register = () => {
         role: loginData.user.role,
       });
 
-      toast.success('Account created & logged in!');
-      navigate('/'); // atau navigate('/profile')
+      toast.success('Akun berhasil dibuat & login!');
+      navigate('/');
 
     } catch (error) {
       console.error(error);
-      toast.error('Registration failed. Please try again.');
+      toast.error('Pendaftaran gagal. Silakan coba lagi.');
     } finally {
       setLoading(false);
     }
@@ -122,15 +122,15 @@ export const Register = () => {
       <div className="max-w-md mx-auto">
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Create Account</CardTitle>
+            <CardTitle className="text-2xl">Buat Akun</CardTitle>
             <CardDescription>
-              Sign up to start shopping with us
+              Daftar untuk mulai berbelanja bersama kami
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="full_name">Full Name</Label>
+                <Label htmlFor="full_name">Nama Lengkap</Label>
                 <Input
                   id="full_name"
                   type="text"
@@ -163,7 +163,7 @@ export const Register = () => {
               </div>
 
               <div>
-                <Label htmlFor="confirm_password">Confirm Password</Label>
+                <Label htmlFor="confirm_password">Konfirmasi Password</Label>
                 <Input
                   id="confirm_password"
                   type="password"
@@ -178,7 +178,7 @@ export const Register = () => {
                 className="w-full"
                 disabled={loading}
               >
-                {loading ? 'Creating Account...' : 'Create Account'}
+                {loading ? 'Membuat Akun...' : 'Buat Akun'}
               </Button>
             </form>
 
@@ -189,16 +189,16 @@ export const Register = () => {
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                   <span className="bg-background px-2 text-muted-foreground">
-                    Or
+                    Atau
                   </span>
                 </div>
               </div>
 
               <div className="text-center mt-4">
                 <p className="text-sm text-muted-foreground">
-                  Already have an account?{' '}
+                  Sudah punya akun?{' '}
                   <Link to="/login" className="text-primary hover:underline">
-                    Sign in
+                    Masuk
                   </Link>
                 </p>
               </div>

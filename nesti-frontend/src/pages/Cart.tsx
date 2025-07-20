@@ -38,12 +38,12 @@ export const Cart = () => {
 
   const handleRemoveItem = (productId: string, productName: string) => {
     removeFromCart(productId);
-    toast.success(`${productName} removed from cart`);
+    toast.success(`${productName} dihapus dari keranjang`);
   };
 
   const handleClearCart = () => {
     clearCart();
-    toast.success('Cart cleared');
+    toast.success('Keranjang berhasil dikosongkan');
   };
 
   const handleCheckout = () => {
@@ -68,12 +68,12 @@ export const Cart = () => {
     return (
       <div className="container py-8">
         <div className="text-center py-12">
-          <h1 className="text-3xl font-bold mb-4">Your Cart is Empty</h1>
+          <h1 className="text-3xl font-bold mb-4">Keranjang Anda Kosong</h1>
           <p className="text-muted-foreground mb-8">
-            Looks like you haven't added anything to your cart yet.
+            Sepertinya Anda belum menambahkan apapun ke keranjang.
           </p>
           <Button asChild size="lg">
-            <Link to="/products">Start Shopping</Link>
+            <Link to="/products">Mulai Belanja</Link>
           </Button>
         </div>
       </div>
@@ -81,15 +81,15 @@ export const Cart = () => {
   }
 
   const total = getCartTotal();
-  const shipping = 50000; // Fixed shipping cost
+  const shipping = 50000; // biaya kirim tetap
   const grandTotal = total + shipping;
 
   return (
     <div className="container py-4 md:py-8">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold">Shopping Cart</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">Keranjang Belanja</h1>
         <Button variant="outline" onClick={handleClearCart} size="sm" className="self-start sm:self-auto">
-          Clear Cart
+          Kosongkan Keranjang
         </Button>
       </div>
 
@@ -118,7 +118,7 @@ export const Cart = () => {
                           </Link>
                         </h3>
                         <p className="text-muted-foreground text-sm text-center sm:text-left">
-                          <span className="font-medium">{formatPrice(item.product.price)}</span> each
+                          <span className="font-medium">{formatPrice(item.product.price)}</span> per item
                         </p>
                       </div>
                       <Button
@@ -176,7 +176,7 @@ export const Cart = () => {
         <div className="lg:col-span-1">
           <Card className="sticky top-4">
             <CardHeader className="pb-4">
-              <CardTitle className="text-lg md:text-xl">Order Summary</CardTitle>
+              <CardTitle className="text-lg md:text-xl">Ringkasan Pesanan</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 md:space-y-4">
               <div className="flex justify-between text-sm md:text-base">
@@ -184,7 +184,7 @@ export const Cart = () => {
                 <span>{formatPrice(total)}</span>
               </div>
               <div className="flex justify-between text-sm md:text-base">
-                <span>Shipping</span>
+                <span>Biaya Kirim</span>
                 <span>{formatPrice(shipping)}</span>
               </div>
               <Separator />
@@ -195,10 +195,10 @@ export const Cart = () => {
               
               <div className="space-y-2 pt-4">
                 <Button onClick={handleCheckout} className="w-full" size="lg">
-                  Proceed to Checkout
+                  Lanjut ke Pembayaran
                 </Button>
                 <Button variant="outline" asChild className="w-full">
-                  <Link to="/products">Continue Shopping</Link>
+                  <Link to="/products">Lanjut Belanja</Link>
                 </Button>
               </div>
             </CardContent>

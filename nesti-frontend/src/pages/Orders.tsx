@@ -76,15 +76,15 @@ export const Orders = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge className="bg-yellow-500">Pending</Badge>
+        return <Badge className="bg-yellow-500">Menunggu</Badge>
       case 'paid':
-        return <Badge className="bg-green-500">Paid</Badge>
+        return <Badge className="bg-green-500">Dibayar</Badge>
       case 'shipped':
-        return <Badge className="bg-blue-500">Shipped</Badge>
+        return <Badge className="bg-blue-500">Dikirim</Badge>
       case 'completed':
-        return <Badge className="bg-emerald-600">Delivered</Badge>
+        return <Badge className="bg-emerald-600">Selesai</Badge>
       case 'cancelled':
-        return <Badge variant="destructive">Cancelled</Badge>
+        return <Badge variant="destructive">Dibatalkan</Badge>
       default:
         return <Badge variant="secondary">{status}</Badge>
     }
@@ -93,18 +93,18 @@ export const Orders = () => {
   const getPaymentBadge = (paymentStatus?: string) => {
     switch (paymentStatus) {
       case 'paid':
-        return <Badge className="bg-green-500">Payment: Paid</Badge>
+        return <Badge className="bg-green-500">Pembayaran: Lunas</Badge>
       case 'pending':
-        return <Badge className="bg-yellow-500">Payment: Pending</Badge>
+        return <Badge className="bg-yellow-500">Pembayaran: Menunggu</Badge>
       case 'expired':
-        return <Badge variant="destructive">Payment: Expired</Badge>
+        return <Badge variant="destructive">Pembayaran: Kadaluarsa</Badge>
       case 'cancelled':
-        return <Badge variant="destructive">Payment: Cancelled</Badge>
+        return <Badge variant="destructive">Pembayaran: Dibatalkan</Badge>
       case 'challenge':
-        return <Badge variant="outline">Payment: Challenge</Badge>
+        return <Badge variant="outline">Pembayaran: Perlu Verifikasi</Badge>
       default:
         return paymentStatus ? (
-          <Badge variant="secondary">Payment: {paymentStatus}</Badge>
+          <Badge variant="secondary">Pembayaran: {paymentStatus}</Badge>
         ) : null
     }
   }
@@ -115,7 +115,7 @@ export const Orders = () => {
   }
 
   if (loading) {
-    return <div className="container py-8">Loading orders...</div>
+    return <div className="container py-8">Memuat daftar pesanan…</div>
   }
 
   const renderOrders = (filter?: string) => {
@@ -123,7 +123,7 @@ export const Orders = () => {
       ? orders.filter((o) => o.status === filter)
       : orders
     if (filtered.length === 0) {
-      return <p className="text-sm text-muted-foreground">No orders found.</p>
+      return <p className="text-sm text-muted-foreground">Tidak ada pesanan ditemukan.</p>
     }
     return filtered.map((order) => (
       <Card key={order.id} className="shadow-sm">
@@ -131,14 +131,14 @@ export const Orders = () => {
           <div className="flex justify-between items-start">
             <div>
               <CardTitle className="text-lg">
-                Order #{order.order_number ?? order.id}
+                Pesanan #{order.order_number ?? order.id}
               </CardTitle>
               <CardDescription className="flex items-center gap-3 mt-1">
                 <span className="flex items-center gap-1">
                   <CalendarIcon className="h-4 w-4" />
                   {formatDate(order.created_at)}
                 </span>
-                <span>{order.order_items?.length ?? 0} items</span>
+                <span>{order.order_items?.length ?? 0} item</span>
                 {getPaymentBadge(order.payment_status)}
               </CardDescription>
             </div>
@@ -157,7 +157,7 @@ export const Orders = () => {
               size="sm"
               onClick={() => openDetail(order)}
             >
-              View Details
+              Lihat Detail
             </Button>
           </div>
         </CardContent>
@@ -167,17 +167,19 @@ export const Orders = () => {
 
   return (
     <div className="container py-8">
-      <h1 className="text-3xl font-bold mb-2">Order History</h1>
-      <p className="text-muted-foreground mb-6">Track and manage your orders</p>
+      <h1 className="text-3xl font-bold mb-2">Riwayat Pesanan</h1>
+      <p className="text-muted-foreground mb-6">
+        Lihat dan kelola semua pesanan Anda di Hinggi.id
+      </p>
 
       <Tabs defaultValue="all">
         <TabsList className="grid grid-cols-6 w-full mb-4">
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="pending">Pending</TabsTrigger>
-          <TabsTrigger value="paid">Paid</TabsTrigger>
-          <TabsTrigger value="shipped">Shipped</TabsTrigger>
-          <TabsTrigger value="completed">Delivered</TabsTrigger>
-          <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
+          <TabsTrigger value="all">Semua</TabsTrigger>
+          <TabsTrigger value="pending">Menunggu</TabsTrigger>
+          <TabsTrigger value="paid">Dibayar</TabsTrigger>
+          <TabsTrigger value="shipped">Dikirim</TabsTrigger>
+          <TabsTrigger value="completed">Selesai</TabsTrigger>
+          <TabsTrigger value="cancelled">Dibatalkan</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="space-y-6">
@@ -200,19 +202,17 @@ export const Orders = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Modal Detail */}
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>
-              Order Details – #{selectedOrder?.order_number ?? selectedOrder?.id}
+              Detail Pesanan – #{selectedOrder?.order_number ?? selectedOrder?.id}
             </DialogTitle>
           </DialogHeader>
           {selectedOrder && (
             <div className="space-y-4">
-              {/* Shipping info */}
               <div className="border p-3 rounded-md">
-                <h4 className="font-medium mb-2">Shipping Address</h4>
+                <h4 className="font-medium mb-2">Alamat Pengiriman</h4>
                 <p className="text-sm text-muted-foreground">
                   {selectedOrder.shipping_address.full_name}
                   <br />
@@ -226,9 +226,8 @@ export const Orders = () => {
                 </p>
               </div>
 
-              {/* Items */}
               <div className="space-y-2">
-                <h4 className="font-medium">Items</h4>
+                <h4 className="font-medium">Daftar Item</h4>
                 {selectedOrder?.order_items?.map((item) => (
                   <div key={item.id} className="flex justify-between text-sm">
                     <span>
@@ -241,16 +240,15 @@ export const Orders = () => {
 
               <Separator />
 
-              {/* Totals */}
               {(() => {
                 const grandTotal = selectedOrder.total_amount
                 return (
                   <div className="border p-3 rounded-md">
-                    <div className="flex justify-between text-sm">
-                      <span>Setelah dihtiung dengan biaya Shipping</span>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Termasuk biaya pengiriman</span>
                     </div>
                     <Separator />
-                    <div className="flex justify-between font-semibold">
+                    <div className="flex justify-between font-semibold mt-2">
                       <span>Total</span>
                       <span>{formatPrice(grandTotal)}</span>
                     </div>

@@ -1,11 +1,9 @@
-// Update this page (the content is just a fallback if you fail to update the page)
-
 const Index = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
+        <h1 className="text-4xl font-bold mb-4">Hinggi.id</h1>
+        <p className="text-xl text-muted-foreground">Platform penjualan sarung adat khas NTT yang hadir untuk memperkenalkan, melestarikan, dan memajukan warisan budaya Nusantara. Temukan koleksi terbaik kami dan dukung pengrajin lokal dengan berbelanja sekarang juga.</p>
       </div>
     </div>
   );

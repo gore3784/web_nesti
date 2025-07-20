@@ -72,15 +72,15 @@ export const AdminUsers = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Users</h1>
-        <p className="text-muted-foreground">Manage customer accounts</p>
+        <h1 className="text-3xl font-bold">Pengguna</h1>
+        <p className="text-muted-foreground">Kelola akun pelanggan</p>
       </div>
 
       {/* 📌 Stats */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Pengguna</CardTitle>
             <UserCheck className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
@@ -90,7 +90,7 @@ export const AdminUsers = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Order</CardTitle>
             <UserCheck className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
@@ -114,18 +114,18 @@ export const AdminUsers = () => {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <p className="text-muted-foreground">Loading users...</p>
+            <p className="text-muted-foreground">Memuat pengguna...</p>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
+                  <TableHead>Nama</TableHead>
                   <TableHead>Email</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead>Joined</TableHead>
-                  <TableHead>Orders</TableHead>
-                  <TableHead>Total Spent</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead>No. Telp</TableHead>
+                  <TableHead>Tanggal Bergabung</TableHead>
+                  <TableHead>Order</TableHead>
+                  <TableHead>Total Belanja</TableHead>
+                  <TableHead>Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

@@ -23,7 +23,7 @@ export const Categories = () => {
         setCategories(catData);
         setProducts(prodData);
       } catch (error) {
-        console.error('Failed to load categories or products:', error);
+        console.error('Gagal memuat kategori atau produk:', error);
       }
     };
     fetchData();
@@ -41,9 +41,9 @@ export const Categories = () => {
   return (
     <div className="container py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Product Categories</h1>
+        <h1 className="text-3xl font-bold mb-2">Kategori Produk</h1>
         <p className="text-muted-foreground">
-          Browse our wide selection of products by category
+          Jelajahi berbagai pilihan produk kami berdasarkan kategori
         </p>
       </div>
 
@@ -61,9 +61,9 @@ export const Categories = () => {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">
-                    {getCategoryProductCount(category.id)} products available
+                    {getCategoryProductCount(category.id)} produk tersedia
                   </span>
-                  <span className="text-primary font-semibold">Browse →</span>
+                  <span className="text-primary font-semibold">Lihat →</span>
                 </div>
               </CardContent>
             </Link>
@@ -73,7 +73,7 @@ export const Categories = () => {
 
       {/* Featured Categories Section */}
       {/* <div className="mt-16">
-        <h2 className="text-2xl font-bold mb-6">Popular Categories</h2>
+        <h2 className="text-2xl font-bold mb-6">Kategori Populer</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {categories.slice(0, 4).map((category) => (
             <Link

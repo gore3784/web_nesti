@@ -88,11 +88,11 @@ export const ProductDetail = () => {
     return (
       <div className="container py-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
+          <h1 className="text-2xl font-bold mb-4">Produk Tidak Ditemukan</h1>
           <p className="text-muted-foreground mb-6">
-            The product you're looking for doesn't exist.
+            Produk yang Anda cari tidak tersedia.
           </p>
-          <Button onClick={() => navigate('/')}>Back to Home</Button>
+          <Button onClick={() => navigate('/')}>Kembali ke Beranda</Button>
         </div>
       </div>
     );
@@ -102,16 +102,16 @@ export const ProductDetail = () => {
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
-    toast.success(`${quantity} × ${product.name} added to cart!`);
+    toast.success(`${quantity} × ${product.name} berhasil ditambahkan ke keranjang!`);
   };
 
   const handleWishlistToggle = () => {
     if (inWishlist) {
       removeFromWishlist(product.id);
-      toast.success(`${product.name} removed from wishlist`);
+      toast.success(`${product.name} dihapus dari wishlist`);
     } else {
       addToWishlist(product);
-      toast.success(`${product.name} added to wishlist!`);
+      toast.success(`${product.name} ditambahkan ke wishlist!`);
     }
   };
 
@@ -150,12 +150,12 @@ export const ProductDetail = () => {
             />
             {product.stock <= 5 && product.stock > 0 && (
               <Badge variant="destructive" className="absolute top-4 left-4">
-                Only {product.stock} left
+                Sisa {product.stock} lagi
               </Badge>
             )}
             {product.stock === 0 && (
               <Badge variant="secondary" className="absolute top-4 left-4">
-                Out of Stock
+                Stok Habis
               </Badge>
             )}
           </div>
@@ -188,7 +188,7 @@ export const ProductDetail = () => {
 
           <div className="space-y-4">
             <div>
-              <h3 className="font-semibold mb-2">Description</h3>
+              <h3 className="font-semibold mb-2">Deskripsi</h3>
               <p className="text-muted-foreground leading-relaxed">
                 {product.description}
               </p>
@@ -196,7 +196,7 @@ export const ProductDetail = () => {
 
             <div className="flex items-center space-x-4">
               <span className="text-sm text-muted-foreground">
-                Stock: {product.stock} available
+                Stok: {product.stock} tersedia
               </span>
             </div>
           </div>
@@ -204,7 +204,7 @@ export const ProductDetail = () => {
           {/* Quantity Selector */}
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium mb-2 block">Quantity</label>
+              <label className="text-sm font-medium mb-2 block">Jumlah</label>
               <div className="flex items-center space-x-2">
                 <Button
                   variant="outline"
@@ -238,7 +238,7 @@ export const ProductDetail = () => {
               size="lg"
             >
               <ShoppingCartIcon className="h-5 w-5 mr-2" />
-              {product.stock === 0 ? 'Out of Stock' : `Add ${quantity} to Cart`}
+              {product.stock === 0 ? 'Stok Habis' : `Tambah ${quantity} ke Keranjang`}
             </Button>
 
             <Button
@@ -250,12 +250,12 @@ export const ProductDetail = () => {
               {inWishlist ? (
                 <>
                   <HeartSolidIcon className="h-5 w-5 mr-2 text-destructive" />
-                  Remove from Wishlist
+                  Hapus dari Wishlist
                 </>
               ) : (
                 <>
                   <HeartIcon className="h-5 w-5 mr-2" />
-                  Add to Wishlist
+                  Tambah ke Wishlist
                 </>
               )}
             </Button>
@@ -264,24 +264,24 @@ export const ProductDetail = () => {
           {/* Product Details */}
           <Card>
             <CardContent className="p-6">
-              <h3 className="font-semibold mb-4">Product Details</h3>
+              <h3 className="font-semibold mb-4">Detail Produk</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Slug:</span>
                   <span>{product.slug}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Availability:</span>
+                  <span className="text-muted-foreground">Ketersediaan:</span>
                   <span
                     className={
                       product.stock > 0 ? 'text-green-600' : 'text-red-600'
                     }
                   >
-                    {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                    {product.stock > 0 ? 'Tersedia' : 'Stok Habis'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Category:</span>
+                  <span className="text-muted-foreground">Kategori:</span>
                   <span>{categories.find((c) => c.id === product.category_id)?.name}</span>
                 </div>
               </div>

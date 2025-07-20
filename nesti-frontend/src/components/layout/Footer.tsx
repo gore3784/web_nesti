@@ -14,63 +14,63 @@ export const Footer = () => {
               <span className="font-bold text-xl">Hinggi.id</span>
             </div>
             <p className="text-muted-foreground text-sm">
-              Hinggi.id adalah toko online yang menyediakan berbagai produk dengan harga terjangkau.
+              Hinggi.id adalah toko online yang menyediakan berbagai kain tradisional khas Nusa Tenggara Timur dengan harga terjangkau.
             </p>
           </div>
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h3 className="font-semibold">Quick Links</h3>
+            <h3 className="font-semibold">Tautan Cepat</h3>
             <nav className="flex flex-col space-y-2">
               <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-                Home
+                Beranda
               </Link>
               <Link to="/products" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-                Products
+                Produk
               </Link>
               <Link to="/categories" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-                Categories
+                Kategori
               </Link>
               <Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-                About Us
+                Tentang Kami
               </Link>
             </nav>
           </div>
 
           {/* Customer Service */}
           <div className="space-y-4">
-            <h3 className="font-semibold">Customer Service</h3>
+            <h3 className="font-semibold">Layanan Pelanggan</h3>
             <nav className="flex flex-col space-y-2">
               <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-                Contact Us
+                Hubungi Kami
               </Link>
               <Link to="/faq" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                 FAQ
               </Link>
               <Link to="/shipping" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-                Shipping Info
+                Informasi Pengiriman
               </Link>
               <Link to="/returns" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-                Returns
+                Pengembalian
               </Link>
             </nav>
           </div>
 
           {/* Account */}
           <div className="space-y-4">
-            <h3 className="font-semibold">Account</h3>
+            <h3 className="font-semibold">Akun</h3>
             <nav className="flex flex-col space-y-2">
               <Link to="/profile" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-                My Account
+                Akun Saya
               </Link>
               <Link to="/orders" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-                Order History
+                Riwayat Pesanan
               </Link>
               <Link to="/wishlist" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                 Wishlist
               </Link>
               <Link to="/cart" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-                Shopping Cart
+                Keranjang Belanja
               </Link>
             </nav>
           </div>
@@ -78,14 +78,14 @@ export const Footer = () => {
 
         <div className="border-t mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-muted-foreground text-sm">
-            © 2024 Hinggi.id. All rights reserved.
+            © 2024 Hinggi.id. Hak cipta dilindungi.
           </p>
           <div className="flex space-x-4 mt-4 md:mt-0">
             <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-              Privacy Policy
+              Kebijakan Privasi
             </Link>
             <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-              Terms of Service
+              Ketentuan Layanan
             </Link>
           </div>
         </div>

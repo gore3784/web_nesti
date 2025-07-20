@@ -28,7 +28,7 @@ export const Login = () => {
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
-      toast.error('Please fill in all fields');
+      toast.error('Silakan lengkapi semua kolom.');
       return;
     }
 
@@ -54,15 +54,15 @@ export const Login = () => {
           const messages = Object.values(data.errors).flat().join('\n');
           toast.error(messages);
         } else {
-          toast.error(data.message || 'Login failed');
+          toast.error(data.message || 'Gagal masuk.');
         }
         return;
       }
 
-      // ✅ Simpan token ke localStorage
+      // ✅ Simpan token
       localStorage.setItem('token', data.token);
 
-      // ✅ Simpan user ke store (perhatikan field yang kamu punya)
+      // ✅ Simpan user
       setUser({
         id: data.user.id,
         email: data.user.email,
@@ -72,11 +72,11 @@ export const Login = () => {
         created_at: data.user.created_at || new Date().toISOString(),
       });
 
-      toast.success('Login successful!');
-      navigate('/'); // arahkan ke halaman home atau profile
+      toast.success('Berhasil masuk! Selamat berbelanja.');
+      navigate('/');
     } catch (error) {
       console.error(error);
-      toast.error('Login failed. Please check your credentials.');
+      toast.error('Gagal masuk. Silakan periksa kembali data Anda.');
     } finally {
       setLoading(false);
     }
@@ -87,15 +87,15 @@ export const Login = () => {
       <div className="max-w-md mx-auto">
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Welcome Back</CardTitle>
+            <CardTitle className="text-2xl">Selamat Datang Kembali</CardTitle>
             <CardDescription>
-              Sign in to your account to continue shopping
+              Masuk ke akun Anda untuk melanjutkan berbelanja di Hinggi.id
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">Alamat Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -106,7 +106,7 @@ export const Login = () => {
               </div>
 
               <div>
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Kata Sandi</Label>
                 <Input
                   id="password"
                   type="password"
@@ -121,7 +121,7 @@ export const Login = () => {
                 className="w-full"
                 disabled={loading}
               >
-                {loading ? 'Signing in...' : 'Sign In'}
+                {loading ? 'Memproses...' : 'Masuk'}
               </Button>
             </form>
 
@@ -132,16 +132,16 @@ export const Login = () => {
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
                   <span className="bg-background px-2 text-muted-foreground">
-                    Or
+                    Atau
                   </span>
                 </div>
               </div>
 
               <div className="text-center mt-4">
                 <p className="text-sm text-muted-foreground">
-                  Don&apos;t have an account?{' '}
+                  Belum punya akun?{' '}
                   <Link to="/register" className="text-primary hover:underline">
-                    Sign up
+                    Daftar Sekarang
                   </Link>
                 </p>
               </div>

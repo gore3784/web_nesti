@@ -35,24 +35,22 @@ export const RegisterModal = ({ open, onOpenChange, onSwitchToLogin }: RegisterM
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validasi form
     if (!formData.full_name || !formData.email || !formData.password || !formData.confirm_password) {
-      toast.error('Please fill in all fields');
+      toast.error('Harap isi semua kolom');
       return;
     }
     if (formData.password !== formData.confirm_password) {
-      toast.error('Passwords do not match');
+      toast.error('Password tidak sama');
       return;
     }
     if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters long');
+      toast.error('Password harus minimal 6 karakter');
       return;
     }
 
     setLoading(true);
 
     try {
-      // 🔥 Daftar akun baru
       const response = await fetch(`${import.meta.env.VITE_API_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -68,12 +66,11 @@ export const RegisterModal = ({ open, onOpenChange, onSwitchToLogin }: RegisterM
         const errorData = await response.json();
         toast.error(
           errorData.message ||
-          (errorData.errors ? JSON.stringify(errorData.errors) : 'Registration failed.')
+          (errorData.errors ? JSON.stringify(errorData.errors) : 'Pendaftaran gagal.')
         );
         return;
       }
 
-      // ✅ Register sukses, lanjut login otomatis
       await response.json();
 
       const loginResponse = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
@@ -86,7 +83,7 @@ export const RegisterModal = ({ open, onOpenChange, onSwitchToLogin }: RegisterM
       });
 
       if (!loginResponse.ok) {
-        toast.success('Account created! Please login.');
+        toast.success('Akun berhasil dibuat! Silakan login.');
         onOpenChange(false);
         navigate('/login');
         return;
@@ -94,10 +91,8 @@ export const RegisterModal = ({ open, onOpenChange, onSwitchToLogin }: RegisterM
 
       const loginData = await loginResponse.json();
 
-      // ✅ Simpan token ke localStorage
       localStorage.setItem('token', loginData.token);
 
-      // ✅ Simpan user ke store
       setUser({
         id: loginData.user.id,
         email: loginData.user.email,
@@ -106,13 +101,13 @@ export const RegisterModal = ({ open, onOpenChange, onSwitchToLogin }: RegisterM
         created_at: loginData.user.created_at,
       });
 
-      toast.success('Account created & logged in!');
-      onOpenChange(false); // Tutup modal
-      navigate('/');       // Arahkan ke halaman utama atau /profile
+      toast.success('Akun berhasil dibuat & login!');
+      onOpenChange(false);
+      navigate('/');
 
     } catch (error) {
       console.error('Network error:', error);
-      toast.error('Registration failed. Please try again.');
+      toast.error('Pendaftaran gagal. Silakan coba lagi.');
     } finally {
       setLoading(false);
     }
@@ -122,15 +117,15 @@ export const RegisterModal = ({ open, onOpenChange, onSwitchToLogin }: RegisterM
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-2xl text-center">Create Account</DialogTitle>
+          <DialogTitle className="text-2xl text-center">Buat Akun</DialogTitle>
           <DialogDescription className="text-center">
-            Sign up to start shopping with us
+            Daftar untuk mulai berbelanja bersama kami
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="full_name">Full Name</Label>
+            <Label htmlFor="full_name">Nama Lengkap</Label>
             <Input
               id="full_name"
               type="text"
@@ -152,7 +147,7 @@ export const RegisterModal = ({ open, onOpenChange, onSwitchToLogin }: RegisterM
           </div>
 
           <div>
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Kata Sandi</Label>
             <Input
               id="password"
               type="password"
@@ -163,7 +158,7 @@ export const RegisterModal = ({ open, onOpenChange, onSwitchToLogin }: RegisterM
           </div>
 
           <div>
-            <Label htmlFor="confirm_password">Confirm Password</Label>
+            <Label htmlFor="confirm_password">Konfirmasi Kata Sandi</Label>
             <Input
               id="confirm_password"
               type="password"
@@ -178,7 +173,7 @@ export const RegisterModal = ({ open, onOpenChange, onSwitchToLogin }: RegisterM
             className="w-full"
             disabled={loading}
           >
-            {loading ? 'Creating Account...' : 'Create Account'}
+            {loading ? 'Membuat Akun...' : 'Buat Akun'}
           </Button>
         </form>
 
@@ -189,20 +184,23 @@ export const RegisterModal = ({ open, onOpenChange, onSwitchToLogin }: RegisterM
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
-                Or
+                Atau
               </span>
             </div>
           </div>
 
           <div className="text-center mt-4">
             <p className="text-sm text-muted-foreground">
-              Already have an account?{' '}
+              Sudah punya akun?{' '}
               <button
                 type="button"
-                onClick={onSwitchToLogin}
+                onClick={() => {
+                  onOpenChange(false); // tutup modal register dulu
+                  onSwitchToLogin();   // lalu jalankan switch
+                }}
                 className="text-primary hover:underline"
               >
-                Sign in
+                Masuk
               </button>
             </p>
           </div>

@@ -61,11 +61,11 @@ export const AdminDashboard = () => {
   }, [])
 
   const stats = [
-    { title: 'Total Products', value: totalProducts, icon: Package, color: 'text-blue-600' },
-    { title: 'Low Stock Items', value: lowStockProducts, icon: TrendingUp, color: 'text-orange-600' },
-    { title: 'Total Orders', value: totalOrders, icon: ShoppingBag, color: 'text-green-600' },
+    { title: 'Total Produk', value: totalProducts, icon: Package, color: 'text-blue-600' },
+    { title: 'Produk Dengan Stok Rendah', value: lowStockProducts, icon: TrendingUp, color: 'text-orange-600' },
+    { title: 'Total Transaksi', value: totalOrders, icon: ShoppingBag, color: 'text-green-600' },
     {
-      title: 'Revenue',
+      title: 'Pendapatan',
       value: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(totalRevenue),
       icon: Users,
       color: 'text-purple-600'
@@ -76,7 +76,7 @@ export const AdminDashboard = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">Overview of your e-commerce store</p>
+        <p className="text-muted-foreground">Ringkasan dari toko e-commerce Anda</p>
       </div>
 
       {loading ? (
@@ -100,7 +100,7 @@ export const AdminDashboard = () => {
           <div className="grid gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>Recent Orders</CardTitle>
+                <CardTitle>Transaksi Terbaru</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -110,7 +110,7 @@ export const AdminDashboard = () => {
                       className="flex items-center justify-between p-3 bg-accent rounded-lg"
                     >
                       <div>
-                        <p className="font-medium">Order #{order.id}</p>
+                        <p className="font-medium">Transaksi #{order.id}</p>
                         <p className="text-sm text-muted-foreground">
                           {order.user?.full_name || 'Customer'}
                         </p>
@@ -136,7 +136,7 @@ export const AdminDashboard = () => {
                     </div>
                   ))}
                   {recentOrders.length === 0 && (
-                    <p className="text-sm text-muted-foreground">No recent orders</p>
+                    <p className="text-sm text-muted-foreground">Tidak ada transaksi terbaru</p>
                   )}
                 </div>
               </CardContent>
@@ -144,7 +144,7 @@ export const AdminDashboard = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Low Stock Alert</CardTitle>
+                <CardTitle>Peringatan Stok</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -163,7 +163,7 @@ export const AdminDashboard = () => {
                     </div>
                   ))}
                   {lowStockList.length === 0 && (
-                    <p className="text-sm text-muted-foreground">No low stock items</p>
+                    <p className="text-sm text-muted-foreground">Tidak ada produk dengan stok rendah</p>
                   )}
                 </div>
               </CardContent>

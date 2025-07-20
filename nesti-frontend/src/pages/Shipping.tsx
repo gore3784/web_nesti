@@ -43,15 +43,15 @@ export const Shipping = () => {
   const renderStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge className="bg-yellow-500">Pending</Badge>;
+        return <Badge className="bg-yellow-500">Menunggu</Badge>;
       case 'paid':
-        return <Badge className="bg-green-500">Paid</Badge>;
+        return <Badge className="bg-green-500">Dibayar</Badge>;
       case 'shipped':
-        return <Badge className="bg-blue-500">Shipped</Badge>;
+        return <Badge className="bg-blue-500">Dikirim</Badge>;
       case 'completed':
-        return <Badge className="bg-emerald-600">Delivered</Badge>;
+        return <Badge className="bg-emerald-600">Terkirim</Badge>;
       case 'cancelled':
-        return <Badge variant="destructive">Cancelled</Badge>;
+        return <Badge variant="destructive">Dibatalkan</Badge>;
       default:
         return <Badge>{status}</Badge>;
     }
@@ -61,10 +61,9 @@ export const Shipping = () => {
     <div className="container py-8 space-y-10">
       {/* ================= SHIPPING INFORMATION ================= */}
       <div>
-        <h1 className="text-3xl font-bold mb-2">Shipping Information</h1>
+        <h1 className="text-3xl font-bold mb-2">Informasi Pengiriman</h1>
         <p className="text-muted-foreground mb-8">
-          Everything you need to know about our shipping policies and delivery
-          options
+          Semua yang perlu Anda ketahui tentang kebijakan pengiriman dan opsi pengantaran kami
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -74,30 +73,30 @@ export const Shipping = () => {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <TruckIcon className="h-5 w-5" />
-                  <span>Shipping Options</span>
+                  <span>Pilihan Pengiriman</span>
                 </CardTitle>
                 <CardDescription>
-                  Choose the delivery speed that works best for you
+                  Pilih kecepatan pengiriman yang sesuai dengan Anda
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="border rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold">Standard Shipping</h4>
-                    <Badge variant="secondary">Most Popular</Badge>
+                    <h4 className="font-semibold">Pengiriman Standar</h4>
+                    <Badge variant="secondary">Paling Populer</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Reliable delivery for everyday orders
+                    Pengiriman andal untuk pesanan sehari-hari
                   </p>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="font-medium">Delivery Time:</span>
+                      <span className="font-medium">Waktu Pengiriman:</span>
                       <p className="text-muted-foreground">
-                        2-5 business days
+                        2-5 hari kerja
                       </p>
                     </div>
                     <div>
-                      <span className="font-medium">Cost:</span>
+                      <span className="font-medium">Biaya:</span>
                       <p className="text-muted-foreground">
                         {formatPrice(15000)} - {formatPrice(35000)}
                       </p>
@@ -107,21 +106,21 @@ export const Shipping = () => {
 
                 <div className="border rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold">Express Shipping</h4>
-                    <Badge variant="default">Fast</Badge>
+                    <h4 className="font-semibold">Pengiriman Ekspres</h4>
+                    <Badge variant="default">Cepat</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Quick delivery when you need it fast
+                    Pengiriman cepat ketika Anda membutuhkannya segera
                   </p>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="font-medium">Delivery Time:</span>
+                      <span className="font-medium">Waktu Pengiriman:</span>
                       <p className="text-muted-foreground">
-                        1-2 business days
+                        1-2 hari kerja
                       </p>
                     </div>
                     <div>
-                      <span className="font-medium">Cost:</span>
+                      <span className="font-medium">Biaya:</span>
                       <p className="text-muted-foreground">
                         {formatPrice(25000)} - {formatPrice(50000)}
                       </p>
@@ -131,19 +130,19 @@ export const Shipping = () => {
 
                 <div className="border rounded-lg p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold">Same Day Delivery</h4>
-                    <Badge variant="destructive">Jakarta Only</Badge>
+                    <h4 className="font-semibold">Pengiriman Hari yang Sama</h4>
+                    <Badge variant="destructive">Khusus NTT</Badge>
                   </div>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Get your order on the same day (Jakarta area only)
+                    Pesanan sampai di hari yang sama (hanya area NTT)
                   </p>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="font-medium">Delivery Time:</span>
-                      <p className="text-muted-foreground">Same day</p>
+                      <span className="font-medium">Waktu Pengiriman:</span>
+                      <p className="text-muted-foreground">Hari yang sama</p>
                     </div>
                     <div>
-                      <span className="font-medium">Cost:</span>
+                      <span className="font-medium">Biaya:</span>
                       <p className="text-muted-foreground">
                         {formatPrice(50000)} - {formatPrice(75000)}
                       </p>
@@ -157,44 +156,44 @@ export const Shipping = () => {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <MapPinIcon className="h-5 w-5" />
-                  <span>Delivery Areas</span>
+                  <span>Area Pengiriman</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-semibold text-green-600">
-                      Jakarta & Surrounding Areas
+                      NTT & Sekitarnya
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      Jakarta, Bogor, Depok, Tangerang, Bekasi (Jabodetabek)
+                      NTT, Jawa Timur, Jawa Barat, Sumatera, Kalimantan, Sulawesi
                     </p>
                     <p className="text-sm font-medium">
-                      All shipping options available
+                      Semua opsi pengiriman tersedia
                     </p>
                   </div>
 
                   <div>
                     <h4 className="font-semibold text-blue-600">
-                      Major Cities
+                      Kota Besar
                     </h4>
                     <p className="text-sm text-muted-foreground">
                       Bandung, Surabaya, Yogyakarta, Semarang, Medan, Makassar
                     </p>
                     <p className="text-sm font-medium">
-                      Standard & Express shipping
+                      Pengiriman Standar & Ekspres
                     </p>
                   </div>
 
                   <div>
                     <h4 className="font-semibold text-orange-600">
-                      Other Areas
+                      Area Lain
                     </h4>
                     <p className="text-sm text-muted-foreground">
-                      All other cities and regions in Indonesia
+                      Semua kota dan daerah lain di Indonesia
                     </p>
                     <p className="text-sm font-medium">
-                      Standard shipping only
+                      Hanya Pengiriman Standar
                     </p>
                   </div>
                 </div>
@@ -208,30 +207,28 @@ export const Shipping = () => {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <ShieldCheckIcon className="h-5 w-5" />
-                  <span>Free Shipping</span>
+                  <span>Gratis Ongkir</span>
                 </CardTitle>
                 <CardDescription>
-                  Enjoy free shipping on qualifying orders
+                  Nikmati gratis ongkir untuk pesanan tertentu
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                   <h4 className="font-semibold text-green-800 mb-2">
-                    Free Standard Shipping
+                    Gratis Ongkir Standar
                   </h4>
                   <p className="text-sm text-green-700">
-                    Orders over {formatPrice(500000)} within Jakarta area qualify
-                    for free standard shipping.
+                    Pesanan di atas {formatPrice(500000)} dalam area NTT mendapatkan gratis ongkir standar.
                   </p>
                 </div>
 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <h4 className="font-semibold text-blue-800 mb-2">
-                    Free Express Shipping
+                    Gratis Ongkir Ekspres
                   </h4>
                   <p className="text-sm text-blue-700">
-                    Orders over {formatPrice(1000000)} within Jakarta area
-                    qualify for free express shipping.
+                    Pesanan di atas {formatPrice(1000000)} dalam area NTT mendapatkan gratis ongkir ekspres.
                   </p>
                 </div>
               </CardContent>
@@ -241,31 +238,28 @@ export const Shipping = () => {
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <ClockIcon className="h-5 w-5" />
-                  <span>Processing Time</span>
+                  <span>Waktu Pemrosesan</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
-                  <h4 className="font-semibold">Order Processing</h4>
+                  <h4 className="font-semibold">Pemrosesan Pesanan</h4>
                   <p className="text-sm text-muted-foreground">
-                    Most orders are processed within 1-2 business days after
-                    payment confirmation.
+                    Sebagian besar pesanan diproses dalam 1-2 hari kerja setelah konfirmasi pembayaran.
                   </p>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold">Cut-off Times</h4>
+                  <h4 className="font-semibold">Batas Waktu</h4>
                   <p className="text-sm text-muted-foreground">
-                    Orders placed before 2:00 PM on weekdays are typically
-                    processed the same day.
+                    Pesanan yang dibuat sebelum pukul 14.00 di hari kerja biasanya diproses di hari yang sama.
                   </p>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold">Weekends & Holidays</h4>
+                  <h4 className="font-semibold">Akhir Pekan & Hari Libur</h4>
                   <p className="text-sm text-muted-foreground">
-                    Orders placed on weekends or holidays will be processed on
-                    the next business day.
+                    Pesanan yang dibuat pada akhir pekan atau hari libur akan diproses di hari kerja berikutnya.
                   </p>
                 </div>
               </CardContent>
@@ -276,14 +270,14 @@ export const Shipping = () => {
 
       {/* ================= ORDER DETAILS WITH TABS ================= */}
       <div>
-        <h2 className="text-2xl font-bold mb-4">Order Details by Status</h2>
+        <h2 className="text-2xl font-bold mb-4">Detail Pesanan per Status</h2>
         <Tabs defaultValue="pending" onValueChange={setCurrentTab}>
           <TabsList className="mb-4">
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="paid">Paid</TabsTrigger>
-            <TabsTrigger value="shipped">Shipped</TabsTrigger>
-            <TabsTrigger value="completed">Delivered</TabsTrigger>
-            <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
+            <TabsTrigger value="pending">Menunggu</TabsTrigger>
+            <TabsTrigger value="paid">Dibayar</TabsTrigger>
+            <TabsTrigger value="shipped">Dikirim</TabsTrigger>
+            <TabsTrigger value="completed">Terkirim</TabsTrigger>
+            <TabsTrigger value="cancelled">Dibatalkan</TabsTrigger>
           </TabsList>
 
           {['pending','paid','shipped','completed','cancelled'].map((status) => (
@@ -295,7 +289,7 @@ export const Shipping = () => {
                     <Card key={order.id}>
                       <CardHeader>
                         <CardTitle className="flex items-center justify-between">
-                          <span>Order #{order.id}</span>
+                          <span>Pesanan #{order.id}</span>
                           {renderStatusBadge(order.status)}
                         </CardTitle>
                         <CardDescription>Total: {formatPrice(order.total)}</CardDescription>
@@ -303,7 +297,7 @@ export const Shipping = () => {
                     </Card>
                   ))}
                 {sampleOrders.filter((o) => o.status === status).length === 0 && (
-                  <p className="text-muted-foreground text-sm">No orders with status {status}.</p>
+                  <p className="text-muted-foreground text-sm">Tidak ada pesanan dengan status {status}.</p>
                 )}
               </div>
             </TabsContent>

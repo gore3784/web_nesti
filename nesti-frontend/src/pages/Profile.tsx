@@ -19,7 +19,6 @@ export const Profile = () => {
   const [orders, setOrders] = useState<any[]>([])
   const [loadingOrders, setLoadingOrders] = useState(false)
 
-  // Load profile
   useEffect(() => {
     axios.get<User>('/api/profile')
       .then((res) => {
@@ -33,25 +32,24 @@ export const Profile = () => {
       })
       .catch((err) => {
         console.error('Profile load error:', err.response?.status, err.response?.data || err.message)
-        toast.error('Failed to load profile')
+        toast.error('Gagal memuat profil')
       })
   }, [setUser])
 
-  // Load orders
   useEffect(() => {
     if (!user) return;
     setLoadingOrders(true);
-  
+
     axios.get<any[]>('/api/orders')
       .then((res) => {
         setOrders(res.data || []);
       })
       .catch((err) => {
         console.error('Orders load error:', err.response?.status, err.response?.data || err.message);
-        toast.error('Failed to load orders');
+        toast.error('Gagal memuat pesanan');
       })
       .then(() => {
-        setLoadingOrders(false); // ganti dari .finally ke .then
+        setLoadingOrders(false);
       });
   }, [user]);
 
@@ -63,22 +61,22 @@ export const Profile = () => {
         phone: formData.phone,
       })
       setUser(res.data.user)
-      toast.success(res.data.message || 'Profile updated successfully')
+      toast.success(res.data.message || 'Profil berhasil diperbarui')
       setIsEditing(false)
     } catch (err: any) {
       console.error('Update profile error:', err.response?.status, err.response?.data || err.message)
-      toast.error(err.response?.data?.message || 'Failed to update profile')
+      toast.error(err.response?.data?.message || 'Gagal memperbarui profil')
     }
   }
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault()
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error('New passwords do not match')
+      toast.error('Password baru tidak sama')
       return
     }
     if (passwordData.newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters')
+      toast.error('Password minimal 6 karakter')
       return
     }
     try {
@@ -87,11 +85,11 @@ export const Profile = () => {
         newPassword: passwordData.newPassword,
         newPassword_confirmation: passwordData.confirmPassword,
       })
-      toast.success(res.data.message || 'Password changed successfully')
+      toast.success(res.data.message || 'Password berhasil diubah')
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
     } catch (err: any) {
       console.error('Change password error:', err.response?.status, err.response?.data || err.message)
-      toast.error(err.response?.data?.message || 'Failed to change password')
+      toast.error(err.response?.data?.message || 'Gagal mengubah password')
     }
   }
 
@@ -100,12 +98,12 @@ export const Profile = () => {
       <div className="container py-8">
         <div className="text-center py-12">
           <UserIcon className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-          <h1 className="text-3xl font-bold mb-4">Please Login</h1>
+          <h1 className="text-3xl font-bold mb-4">Silakan Masuk</h1>
           <p className="text-muted-foreground mb-8">
-            You need to be logged in to access your profile.
+            Anda harus masuk terlebih dahulu untuk mengakses profil Anda.
           </p>
           <Button asChild size="lg">
-            <a href="/login">Login</a>
+            <a href="/login">Masuk</a>
           </Button>
         </div>
       </div>
@@ -115,16 +113,16 @@ export const Profile = () => {
   return (
     <div className="container py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">My Account</h1>
-        <p className="text-muted-foreground">Manage your account settings and preferences</p>
+        <h1 className="text-3xl font-bold mb-2">Akun Saya</h1>
+        <p className="text-muted-foreground">Kelola pengaturan dan preferensi akun Anda</p>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
-          <TabsTrigger value="orders">Orders</TabsTrigger>
-          <TabsTrigger value="activity">Activity</TabsTrigger>
+          <TabsTrigger value="profile">Profil</TabsTrigger>
+          <TabsTrigger value="security">Keamanan</TabsTrigger>
+          <TabsTrigger value="orders">Pesanan</TabsTrigger>
+          <TabsTrigger value="activity">Aktivitas</TabsTrigger>
         </TabsList>
 
         {/* PROFILE */}
@@ -132,9 +130,9 @@ export const Profile = () => {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Profile Information</CardTitle>
+                <CardTitle>Informasi Profil</CardTitle>
                 <Button variant="outline" onClick={() => setIsEditing(!isEditing)}>
-                  {isEditing ? 'Cancel' : 'Edit Profile'}
+                  {isEditing ? 'Batal' : 'Edit Profil'}
                 </Button>
               </div>
             </CardHeader>
@@ -142,7 +140,7 @@ export const Profile = () => {
               <form onSubmit={handleProfileUpdate} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="full_name">Full Name</Label>
+                    <Label htmlFor="full_name">Nama Lengkap</Label>
                     <Input
                       id="full_name"
                       value={formData.full_name}
@@ -154,10 +152,10 @@ export const Profile = () => {
                   <div>
                     <Label htmlFor="email">Email</Label>
                     <Input id="email" type="email" value={formData.email} disabled className="bg-muted" />
-                    <p className="text-sm text-muted-foreground mt-1">Email cannot be changed</p>
+                    <p className="text-sm text-muted-foreground mt-1">Email tidak dapat diubah</p>
                   </div>
                   <div>
-                    <Label htmlFor="phone">Phone Number</Label>
+                    <Label htmlFor="phone">Nomor Telepon</Label>
                     <Input
                       id="phone"
                       value={formData.phone}
@@ -167,15 +165,15 @@ export const Profile = () => {
                     />
                   </div>
                   <div>
-                    <Label>Member Since</Label>
+                    <Label>Terdaftar Sejak</Label>
                     <Input value={new Date(user.created_at).toLocaleDateString()} disabled className="bg-muted" />
                   </div>
                 </div>
                 {isEditing && (
                   <div className="flex gap-2">
-                    <Button type="submit">Save Changes</Button>
+                    <Button type="submit">Simpan Perubahan</Button>
                     <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
-                      Cancel
+                      Batal
                     </Button>
                   </div>
                 )}
@@ -190,13 +188,13 @@ export const Profile = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <KeyIcon className="h-5 w-5" />
-                Change Password
+                Ubah Password
               </CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handlePasswordChange} className="space-y-4">
                 <div>
-                  <Label htmlFor="currentPassword">Current Password</Label>
+                  <Label htmlFor="currentPassword">Password Saat Ini</Label>
                   <Input
                     id="currentPassword"
                     type="password"
@@ -206,7 +204,7 @@ export const Profile = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="newPassword">New Password</Label>
+                  <Label htmlFor="newPassword">Password Baru</Label>
                   <Input
                     id="newPassword"
                     type="password"
@@ -217,7 +215,7 @@ export const Profile = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <Label htmlFor="confirmPassword">Konfirmasi Password Baru</Label>
                   <Input
                     id="confirmPassword"
                     type="password"
@@ -227,7 +225,7 @@ export const Profile = () => {
                     minLength={6}
                   />
                 </div>
-                <Button type="submit">Change Password</Button>
+                <Button type="submit">Ubah Password</Button>
               </form>
             </CardContent>
           </Card>
@@ -239,19 +237,19 @@ export const Profile = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ShoppingBagIcon className="h-5 w-5" />
-                Order History
+                Riwayat Pesanan
               </CardTitle>
             </CardHeader>
             <CardContent>
               {loadingOrders ? (
-                <p className="text-muted-foreground">Loading orders...</p>
+                <p className="text-muted-foreground">Memuat pesanan...</p>
               ) : orders.length === 0 ? (
                 <div className="text-center py-8">
                   <ShoppingBagIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">No orders yet</p>
-                  <p className="text-sm text-muted-foreground mb-4">Start shopping to see your order history here</p>
+                  <p className="text-muted-foreground">Belum ada pesanan</p>
+                  <p className="text-sm text-muted-foreground mb-4">Mulai berbelanja untuk melihat riwayat pesanan Anda di sini</p>
                   <Button asChild>
-                    <a href="/products">Browse Products</a>
+                    <a href="/products">Lihat Produk</a>
                   </Button>
                 </div>
               ) : (
@@ -260,7 +258,7 @@ export const Profile = () => {
                     <div key={order.id} className="border rounded-lg p-4 hover:bg-accent">
                       <div className="flex justify-between">
                         <div>
-                          <p className="font-medium">Order #{order.id}</p>
+                          <p className="font-medium">Pesanan #{order.id}</p>
                           <p className="text-sm text-muted-foreground">
                             {new Date(order.created_at).toLocaleDateString()}
                           </p>
@@ -287,22 +285,22 @@ export const Profile = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ShoppingBagIcon className="h-5 w-5" />
-                  Shopping Summary
+                  Ringkasan Belanja
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between">
-                  <span>Items in Cart</span>
+                  <span>Item di Keranjang</span>
                   <span className="font-semibold">{cartItems.length}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between">
-                  <span>Wishlist Items</span>
+                  <span>Item di Wishlist</span>
                   <span className="font-semibold">{wishlistItems.length}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between">
-                  <span>Total Orders</span>
+                  <span>Total Pesanan</span>
                   <span className="font-semibold">{orders.length}</span>
                 </div>
               </CardContent>
@@ -312,24 +310,24 @@ export const Profile = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <HeartIcon className="h-5 w-5" />
-                  Quick Actions
+                  Aksi Cepat
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button variant="outline" className="w-full justify-start" asChild>
                   <a href="/cart">
                     <ShoppingBagIcon className="h-4 w-4 mr-2" />
-                    View Cart ({cartItems.length})
+                    Lihat Keranjang ({cartItems.length})
                   </a>
                 </Button>
                 <Button variant="outline" className="w-full justify-start" asChild>
                   <a href="/wishlist">
                     <HeartIcon className="h-4 w-4 mr-2" />
-                    View Wishlist ({wishlistItems.length})
+                    Lihat Wishlist ({wishlistItems.length})
                   </a>
                 </Button>
                 <Button variant="outline" className="w-full justify-start" asChild>
-                  <a href="/products">Continue Shopping</a>
+                  <a href="/products">Lanjut Belanja</a>
                 </Button>
               </CardContent>
             </Card>

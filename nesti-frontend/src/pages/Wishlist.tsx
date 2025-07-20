@@ -18,12 +18,12 @@ export const Wishlist = () => {
 
   const handleRemoveFromWishlist = (productId: string, productName: string) => {
     removeFromWishlist(productId);
-    toast.success(`${productName} removed from wishlist`);
+    toast.success(`${productName} dihapus dari wishlist`);
   };
 
   const handleAddToCart = (product: any) => {
     addToCart(product);
-    toast.success(`${product.name} added to cart`);
+    toast.success(`${product.name} ditambahkan ke keranjang`);
   };
 
   if (wishlistItems.length === 0) {
@@ -31,12 +31,12 @@ export const Wishlist = () => {
       <div className="container py-8">
         <div className="text-center py-12">
           <HeartIcon className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-          <h1 className="text-3xl font-bold mb-4">Your Wishlist is Empty</h1>
+          <h1 className="text-3xl font-bold mb-4">Wishlist Anda Kosong</h1>
           <p className="text-muted-foreground mb-8">
-            Save items you love by clicking the heart icon on any product.
+            Simpan barang yang Anda suka dengan mengklik ikon hati pada produk.
           </p>
           <Button asChild size="lg">
-            <Link to="/products">Start Shopping</Link>
+            <Link to="/products">Mulai Belanja</Link>
           </Button>
         </div>
       </div>
@@ -46,9 +46,9 @@ export const Wishlist = () => {
   return (
     <div className="container py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">My Wishlist</h1>
+        <h1 className="text-3xl font-bold mb-2">Wishlist Saya</h1>
         <p className="text-muted-foreground">
-          {wishlistItems.length} item{wishlistItems.length !== 1 ? 's' : ''} saved
+          {wishlistItems.length} item{wishlistItems.length !== 1 ? '' : ''} disimpan
         </p>
       </div>
 
@@ -91,7 +91,7 @@ export const Wishlist = () => {
                     {formatPrice(item.product.price)}
                   </span>
                   <span className="text-sm text-muted-foreground">
-                    Stock: {item.product.stock}
+                    Stok: {item.product.stock}
                   </span>
                 </div>
                 
@@ -102,12 +102,12 @@ export const Wishlist = () => {
                     disabled={item.product.stock === 0}
                   >
                     <ShoppingCartIcon className="h-4 w-4 mr-2" />
-                    {item.product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                    {item.product.stock === 0 ? 'Stok Habis' : 'Tambahkan ke Keranjang'}
                   </Button>
                   
                   <Button variant="outline" className="w-full" asChild>
                     <Link to={`/products/${item.product.slug}`}>
-                      View Details
+                      Lihat Detail
                     </Link>
                   </Button>
                 </div>

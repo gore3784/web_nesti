@@ -14,13 +14,11 @@ export const Products = () => {
   const [priceRange, setPriceRange] = useState('all');
   const [loading, setLoading] = useState(true);
 
-  // ✅ state baru untuk data dari API
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
 
   const { searchQuery, setSearchQuery, selectedCategory, setSelectedCategory } = useStore();
 
-  // ✅ fetch data dari API
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -32,7 +30,7 @@ export const Products = () => {
         setProducts(prodData);
         setCategories(catData);
       } catch (err) {
-        console.error('Failed to load data', err);
+        console.error('Gagal memuat data', err);
       } finally {
         setLoading(false);
       }
@@ -40,7 +38,6 @@ export const Products = () => {
     fetchData();
   }, []);
 
-  // ambil query dari URL
   useEffect(() => {
     const query = searchParams.get('q');
     if (query) {
@@ -48,7 +45,6 @@ export const Products = () => {
     }
   }, [searchParams, setSearchQuery]);
 
-  // ✅ filter & sort produk dari API
   const filteredAndSortedProducts = useMemo(() => {
     let filtered = [...products];
 
@@ -115,10 +111,10 @@ export const Products = () => {
     <div className="container py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">All Products</h1>
+        <h1 className="text-3xl font-bold mb-2">Semua Produk</h1>
         <p className="text-muted-foreground">
-          {filteredAndSortedProducts.length} products found
-          {searchQuery && ` for "${searchQuery}"`}
+          {filteredAndSortedProducts.length} produk ditemukan
+          {searchQuery && ` untuk "${searchQuery}"`}
         </p>
       </div>
 
@@ -128,7 +124,7 @@ export const Products = () => {
         <div className="relative">
           <Input
             type="search"
-            placeholder="Search products..."
+            placeholder="Cari produk..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -161,14 +157,14 @@ export const Products = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Harga</SelectItem>
-            <SelectItem value="under-500k">Dibawah {formatPrice(500000)}</SelectItem>
+            <SelectItem value="under-500k">Di bawah {formatPrice(500000)}</SelectItem>
             <SelectItem value="500k-1m">
               {formatPrice(500000)} - {formatPrice(1000000)}
             </SelectItem>
             <SelectItem value="1m-5m">
               {formatPrice(1000000)} - {formatPrice(5000000)}
             </SelectItem>
-            <SelectItem value="over-5m">Diatas {formatPrice(5000000)}</SelectItem>
+            <SelectItem value="over-5m">Di atas {formatPrice(5000000)}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -179,10 +175,10 @@ export const Products = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="newest">Terbaru</SelectItem>
-            <SelectItem value="price-low">Harga: Rendah to Tinggi</SelectItem>
-            <SelectItem value="price-high">Harga: Tinggi to Rendah</SelectItem>
-            <SelectItem value="name">Nama: A to Z</SelectItem>
-            <SelectItem value="stock">Stock: Tinggi to Rendah</SelectItem>
+            <SelectItem value="price-low">Harga: Rendah ke Tinggi</SelectItem>
+            <SelectItem value="price-high">Harga: Tinggi ke Rendah</SelectItem>
+            <SelectItem value="name">Nama: A ke Z</SelectItem>
+            <SelectItem value="stock">Stok: Tinggi ke Rendah</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -200,7 +196,7 @@ export const Products = () => {
               setSearchParams({});
             }}
           >
-            Clear All Filters
+            Hapus Semua Filter
           </Button>
         </div>
       )}

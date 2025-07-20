@@ -34,19 +34,16 @@ export const LoginModal = ({ open, onOpenChange, onSwitchToRegister }: LoginModa
     e.preventDefault();
 
     if (!formData.email || !formData.password) {
-      toast.error('Please fill in all fields');
+      toast.error('Harap isi semua kolom');
       return;
     }
 
     setLoading(true);
 
     try {
-      // 🔥 Panggil API Laravel login
       const response = await fetch(`${import.meta.env.VITE_API_URL}/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
@@ -58,17 +55,15 @@ export const LoginModal = ({ open, onOpenChange, onSwitchToRegister }: LoginModa
         console.error('Login error:', errorData);
         toast.error(
           errorData.message ||
-          (errorData.errors ? JSON.stringify(errorData.errors) : 'Login failed.')
+          (errorData.errors ? JSON.stringify(errorData.errors) : 'Login gagal.')
         );
         return;
       }
 
       const data = await response.json();
 
-      // ✅ Simpan token ke localStorage
       localStorage.setItem('token', data.token);
 
-      // ✅ Simpan user ke store
       setUser({
         id: data.user.id,
         email: data.user.email,
@@ -77,12 +72,12 @@ export const LoginModal = ({ open, onOpenChange, onSwitchToRegister }: LoginModa
         created_at: data.user.created_at,
       });
 
-      toast.success('Login successful!');
-      onOpenChange(false); // tutup modal
-      navigate('/'); // arahkan ke halaman home atau profile
+      toast.success('Login berhasil!');
+      onOpenChange(false);
+      navigate('/');
     } catch (error) {
       console.error('Network error:', error);
-      toast.error('Login failed. Please check your credentials.');
+      toast.error('Login gagal. Periksa kembali data Anda.');
     } finally {
       setLoading(false);
     }
@@ -92,9 +87,9 @@ export const LoginModal = ({ open, onOpenChange, onSwitchToRegister }: LoginModa
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-2xl text-center">Welcome Back</DialogTitle>
+          <DialogTitle className="text-2xl text-center">Selamat Datang Kembali</DialogTitle>
           <DialogDescription className="text-center">
-            Sign in to your account to continue shopping
+            Masuk ke akun Anda untuk melanjutkan berbelanja
           </DialogDescription>
         </DialogHeader>
 
@@ -111,7 +106,7 @@ export const LoginModal = ({ open, onOpenChange, onSwitchToRegister }: LoginModa
           </div>
 
           <div>
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Kata Sandi</Label>
             <Input
               id="password"
               type="password"
@@ -126,7 +121,7 @@ export const LoginModal = ({ open, onOpenChange, onSwitchToRegister }: LoginModa
             className="w-full"
             disabled={loading}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Sedang masuk...' : 'Masuk'}
           </Button>
         </form>
 
@@ -137,20 +132,23 @@ export const LoginModal = ({ open, onOpenChange, onSwitchToRegister }: LoginModa
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
-                Or
+                Atau
               </span>
             </div>
           </div>
 
           <div className="text-center mt-4">
             <p className="text-sm text-muted-foreground">
-              Don&apos;t have an account?{' '}
+              Belum punya akun?{' '}
               <button
                 type="button"
-                onClick={onSwitchToRegister}
+                onClick={() => {
+                  onOpenChange(false);
+                  onSwitchToRegister();
+                }}
                 className="text-primary hover:underline"
               >
-                Sign up
+                Daftar
               </button>
             </p>
           </div>
