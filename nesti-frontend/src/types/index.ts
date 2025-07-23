@@ -1,3 +1,5 @@
+import { StatusHistory } from "@/pages/admin/Orders";
+
 export interface Product {
   id: string;
   name: string;
@@ -59,6 +61,8 @@ export interface Order {
 
   // ✅ opsional: simpan Transaction ID dari Midtrans
   transaction_id?: string;
+  status_histories?: StatusHistory[];
+  status_histories?: { status: string; changed_at: string }[];
 }
 
 export interface OrderItem {

@@ -82,7 +82,7 @@ export const Orders = () => {
       case 'shipped':
         return <Badge className="bg-blue-500">Dikirim</Badge>
       case 'completed':
-        return <Badge className="bg-emerald-600">Selesai</Badge>
+        return <Badge className="bg-emerald-600">Diterima</Badge>
       case 'cancelled':
         return <Badge variant="destructive">Dibatalkan</Badge>
       default:
@@ -133,13 +133,24 @@ export const Orders = () => {
               <CardTitle className="text-lg">
                 Pesanan #{order.order_number ?? order.id}
               </CardTitle>
-              <CardDescription className="flex items-center gap-3 mt-1">
+              <CardDescription className="flex flex-col gap-1 mt-1">
                 <span className="flex items-center gap-1">
                   <CalendarIcon className="h-4 w-4" />
                   {formatDate(order.created_at)}
                 </span>
-                <span>{order.order_items?.length ?? 0} item</span>
+                <span>{order.order_items?.length ?? 0} item</span> {/* ✅ ubah ke order_items */}
                 {getPaymentBadge(order.payment_status)}
+
+                {/* 👇 Tambahan: tampilkan histori status */}
+                {order.status_histories && order.status_histories.length > 0 && (
+                  <div className="mt-2 text-xs text-muted-foreground space-y-1">
+                    {order.status_histories.map((h, i) => (
+                      <div key={i}>
+                        {getStatusBadge(h.status)} pada {formatDate(h.changed_at)}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardDescription>
             </div>
             <div className="text-right">
@@ -178,7 +189,7 @@ export const Orders = () => {
           <TabsTrigger value="pending">Menunggu</TabsTrigger>
           <TabsTrigger value="paid">Dibayar</TabsTrigger>
           <TabsTrigger value="shipped">Dikirim</TabsTrigger>
-          <TabsTrigger value="completed">Selesai</TabsTrigger>
+          <TabsTrigger value="completed">Diterima</TabsTrigger>
           <TabsTrigger value="cancelled">Dibatalkan</TabsTrigger>
         </TabsList>
 

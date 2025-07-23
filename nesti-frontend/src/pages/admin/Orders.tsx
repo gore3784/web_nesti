@@ -24,10 +24,35 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription, // ✅ tambahkan
 } from '@/components/ui/dialog';
 import { Eye, Search, Filter } from 'lucide-react';
 import { toast } from 'sonner';
-import type { Order, OrderItem } from '@/types';
+import type { OrderItem } from '@/types';
+
+export interface StatusHistory {
+  status: string;
+  changed_at: string;
+}
+
+export interface Order {
+  id: number;
+  order_number: string;
+  status: string;
+  payment_status: string;
+  created_at: string;
+  total_amount: number;
+  shipping_address?: {
+    full_name: string;
+    phone: string;
+    address: string;
+    city: string;
+    province: string;
+    postal_code: string;
+  };
+  order_items: OrderItem[];
+  statusHistories?: StatusHistory[];
+}
 
 export const AdminOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -36,7 +61,6 @@ export const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -146,13 +170,24 @@ export const AdminOrders = () => {
 
   const handleStatusChange = async (orderId: number, newStatus: Order['status']) => {
     try {
-      await axios.put(`/api/admin/orders/${orderId}/status`, {
+      const res = await axios.put(`/api/admin/orders/${orderId}/status`, {
         status: newStatus,
       });
       toast.success('Order status updated');
+
+      // update status di daftar orders
       setOrders((prev) =>
         prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
       );
+
+      // ✅ kalau dialog sedang terbuka untuk order ini, update histori juga
+      if (selectedOrder && selectedOrder.id === orderId) {
+        setSelectedOrder({
+          ...selectedOrder,
+          status: newStatus,
+          statusHistories: res.data.statusHistories,
+        });
+      }
     } catch (err: any) {
       console.error('Update status error', err.response?.data || err.message);
       toast.error('Failed to update status');
@@ -222,12 +257,12 @@ export const AdminOrders = () => {
                     <code className="font-mono">#{order.id}</code>
                   </TableCell>
                   <TableCell>
-                    <p className="font-medium">{order.shipping_address?.full_name ?? '-'}</p>
-                    <p className="text-sm text-muted-foreground">{order.shipping_address?.phone ?? '-'}</p>
+                    <div className="font-medium">{order.shipping_address?.full_name ?? '-'}</div>
+                    <div className="text-sm text-muted-foreground">{order.shipping_address?.phone ?? '-'}</div>
                   </TableCell>
                   <TableCell>{formatDate(order.created_at)}</TableCell>
                   <TableCell>{formatPrice(order.total_amount)}</TableCell>
-                  <TableCell>
+                  <TableCell className="space-y-1">
                     <Select
                       value={order.status}
                       onValueChange={(val) => handleStatusChange(order.id, val as Order['status'])}
@@ -243,7 +278,18 @@ export const AdminOrders = () => {
                         <SelectItem value="cancelled">Dibatalkan</SelectItem>
                       </SelectContent>
                     </Select>
+
+                    {/* 👇 Tambahan untuk tanggal dari order_status_histories */}
+                    {order.status_histories && order.status_histories.length > 0 && (
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Terakhir diubah:{' '}
+                        {formatDate(
+                          order.status_histories[order.status_histories.length - 1].changed_at
+                        )}
+                      </div>
+                    )}
                   </TableCell>
+
                   <TableCell>{getPaymentBadge(order.payment_status)}</TableCell>
                   <TableCell>
                     <Button variant="ghost" size="sm" onClick={() => handleViewOrder(order)}>
@@ -294,21 +340,25 @@ export const AdminOrders = () => {
             <DialogTitle>
               Detail Transaksi {selectedOrder && <span className="font-mono">#{selectedOrder.id}</span>}
             </DialogTitle>
+            <DialogDescription>
+              Informasi lengkap mengenai transaksi dan riwayat statusnya.
+            </DialogDescription>
           </DialogHeader>
           {selectedOrder ? (
             <div className="space-y-6">
+              {/* Informasi pelanggan */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card>
                   <CardHeader>
                     <CardTitle>Informasi Pelanggan</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2 text-sm">
-                    <p><strong>Nama:</strong> {selectedOrder.shipping_address?.full_name ?? '-'}</p>
-                    <p><strong>Telepon:</strong> {selectedOrder.shipping_address?.phone ?? '-'}</p>
-                    <p><strong>Alamat:</strong> {selectedOrder.shipping_address?.address ?? '-'}</p>
-                    <p><strong>Kota:</strong> {selectedOrder.shipping_address?.city ?? '-'}</p>
-                    <p><strong>Provinsi:</strong> {selectedOrder.shipping_address?.province ?? '-'}</p>
-                    <p><strong>Kode Pos:</strong> {selectedOrder.shipping_address?.postal_code ?? '-'}</p>
+                    <div><strong>Nama:</strong> {selectedOrder.shipping_address?.full_name ?? '-'}</div>
+                    <div><strong>Telepon:</strong> {selectedOrder.shipping_address?.phone ?? '-'}</div>
+                    <div><strong>Alamat:</strong> {selectedOrder.shipping_address?.address ?? '-'}</div>
+                    <div><strong>Kota:</strong> {selectedOrder.shipping_address?.city ?? '-'}</div>
+                    <div><strong>Provinsi:</strong> {selectedOrder.shipping_address?.province ?? '-'}</div>
+                    <div><strong>Kode Pos:</strong> {selectedOrder.shipping_address?.postal_code ?? '-'}</div>
                   </CardContent>
                 </Card>
 
@@ -317,14 +367,42 @@ export const AdminOrders = () => {
                     <CardTitle>Informasi Transaksi</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2 text-sm">
-                    <p><strong>Tanggal:</strong> {formatDate(selectedOrder.created_at)}</p>
-                    <p><strong>Status:</strong> {getStatusBadge(selectedOrder.status)}</p>
-                    <p><strong>Pembayaran:</strong> {getPaymentBadge(selectedOrder.payment_status)}</p>
-                    <p><strong>Total:</strong> {formatPrice(selectedOrder.total_amount)}</p>
+                    <div><strong>Tanggal:</strong> {formatDate(selectedOrder.created_at)}</div>
+                    <div><strong>Status:</strong> {getStatusBadge(selectedOrder.status)}</div>
+                    <div><strong>Pembayaran:</strong> {getPaymentBadge(selectedOrder.payment_status)}</div>
+                    <div><strong>Total:</strong> {formatPrice(selectedOrder.total_amount)}</div>
                   </CardContent>
                 </Card>
               </div>
 
+              {/* Riwayat status */}
+              {selectedOrder?.statusHistories && selectedOrder.statusHistories.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Riwayat Status</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Tanggal Perubahan</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {selectedOrder.statusHistories.map((history, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell>{getStatusBadge(history.status)}</TableCell>
+                            <TableCell>{formatDate(history.changed_at)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Item transaksi */}
               <Card>
                 <CardHeader>
                   <CardTitle>Item Transaksi</CardTitle>

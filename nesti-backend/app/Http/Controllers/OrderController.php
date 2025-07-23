@@ -83,7 +83,13 @@ class OrderController extends Controller
     {
         $user = $request->user();
 
-        $orders = Order::with(['order_items.product', 'shipping_address'])
+        $orders = Order::with([
+            'order_items.product',
+            'shipping_address',
+            'statusHistories' => function ($q) {
+                $q->orderBy('changed_at', 'asc');
+            }
+        ])
             ->where('user_id', $user->id)
             ->latest()
             ->get();
@@ -114,7 +120,13 @@ class OrderController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $orders = Order::with(['order_items.product', 'shipping_address'])
+        $orders = Order::with([
+            'order_items.product',
+            'shipping_address',
+            'statusHistories' => function ($q) {
+                $q->orderBy('changed_at', 'asc');
+            }
+        ])
             ->latest()
             ->get();
 
@@ -138,10 +150,24 @@ class OrderController extends Controller
         $order->status = $validated['status'];
         $order->save();
 
+        // Simpan histori status
+        $order->statusHistories()->create([
+            'status' => $validated['status'],
+            'changed_at' => now(),
+        ]);
+
+        // Muat ulang order beserta histori
+        $order->load([
+            'statusHistories' => function ($q) {
+                $q->orderBy('changed_at', 'asc');
+            }
+        ]);
+
         return response()->json([
             'message' => 'Order status updated successfully',
             'order_id' => $order->id,
             'status' => $order->status,
+            'statusHistories' => $order->statusHistories
         ]);
     }
 
@@ -151,7 +177,7 @@ class OrderController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $order = Order::with(['order_items.product', 'shipping_address'])->find($id);
+        $order = Order::with(['order_items.product', 'shipping_address', 'statusHistories'])->find($id);
 
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
@@ -159,5 +185,4 @@ class OrderController extends Controller
 
         return response()->json($order);
     }
-
 }
