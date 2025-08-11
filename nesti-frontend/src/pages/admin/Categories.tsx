@@ -149,7 +149,8 @@ export const AdminCategories = () => {
                   </TableCell>
                   <TableCell>
                     <span className="bg-accent px-2 py-1 rounded-md text-sm">
-                      {getProductCount(category.id)} products
+                      {/* {getProductCount(category.id)} products */}
+                      {category.products_count} Produk
                     </span>
                   </TableCell>
                   <TableCell>

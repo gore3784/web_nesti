@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from '@/lib/axios'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Package, Users, ShoppingBag, TrendingUp } from 'lucide-react'
+import { Package, Users, ShoppingBag, TrendingUp, DollarSign } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface RecentOrder {
@@ -66,8 +66,9 @@ export const AdminDashboard = () => {
     { title: 'Total Transaksi', value: totalOrders, icon: ShoppingBag, color: 'text-green-600' },
     {
       title: 'Pendapatan',
-      value: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(totalRevenue),
-      icon: Users,
+      // value: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(totalRevenue),
+      value: totalRevenue,
+      icon: DollarSign,
       color: 'text-purple-600'
     }
   ]

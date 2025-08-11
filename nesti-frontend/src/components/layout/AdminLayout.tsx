@@ -61,9 +61,9 @@ export const AdminLayout = () => {
           <div className="flex items-center justify-between h-16 px-6 border-b">
             <div className="flex items-center space-x-3">
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">A</span>
+                <span className="text-primary-foreground font-bold text-sm">{user?.full_name.charAt(0) || user?.email.charAt(0)}</span>
               </div>
-              <h1 className="text-lg font-semibold">Hinggi.id Admin</h1>
+              <h1 className="text-lg font-semibold">{user?.full_name || user?.email}</h1>
             </div>
             <Button
               variant="ghost"

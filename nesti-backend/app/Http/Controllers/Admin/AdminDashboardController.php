@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
 
+use App\Helpers\NumberFormatHelper;
+
 class AdminDashboardController extends Controller
 {
     public function index()
@@ -21,6 +23,10 @@ class AdminDashboardController extends Controller
 
         // Total revenue
         $totalRevenue = Order::sum('total_amount');
+
+        // Format total revenue
+        $totalRevenueRaw = Order::sum('total_amount');
+        $totalRevenue = NumberFormatHelper::formatCurrencyShort($totalRevenueRaw);
 
         // Recent orders (3 terbaru)
         $recentOrders = Order::with('user:id,full_name')

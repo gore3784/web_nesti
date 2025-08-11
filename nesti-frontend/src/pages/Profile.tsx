@@ -258,10 +258,17 @@ export const Profile = () => {
                     <div key={order.id} className="border rounded-lg p-4 hover:bg-accent">
                       <div className="flex justify-between">
                         <div>
-                          <p className="font-medium">Pesanan #{order.id}</p>
+                          <p className="font-medium">Pesanan #{order.order_number ?? order.id}</p>
                           <p className="text-sm text-muted-foreground">
                             {new Date(order.created_at).toLocaleDateString()}
                           </p>
+                          <Button asChild
+                            variant="outline"
+                            size="sm"
+                            className="ml-2"
+                          >
+                            <a href={`/orders`}>Lihat</a>
+                          </Button>
                         </div>
                         <div className="text-right">
                           <p className="font-semibold">{order.status}</p>
