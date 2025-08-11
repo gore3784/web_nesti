@@ -229,8 +229,8 @@ export const Orders = () => {
                   <br />
                   {selectedOrder.shipping_address.address}
                   <br />
-                  {selectedOrder.shipping_address.city},{' '}
-                  {selectedOrder.shipping_address.province}{' '}
+                  {selectedOrder.shipping_address.city}, {selectedOrder.shipping_address.province}
+                  <br />
                   {selectedOrder.shipping_address.postal_code}
                   <br />
                   📞 {selectedOrder.shipping_address.phone}

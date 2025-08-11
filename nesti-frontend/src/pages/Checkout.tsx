@@ -57,12 +57,32 @@ export const Checkout = () => {
     if ((window as any).snap) setSnapReady(true)
   }, [])
 
+  // const handleProvinceChange = (provCode: string) => {
+  //   setShippingAddress(prev => ({ ...prev, province: provCode, city: '' }))
+  //   if (!provCode) {
+  //     setRegencies([])
+  //     return
+  //   }
+  //   fetch(`http://localhost:8000/api/proxy/regencies/${provCode}`)
+  //     .then(res => res.json())
+  //     .then(json => setRegencies(json.data))
+  //     .catch(() => toast.error('Gagal memuat daftar kabupaten/kota.'))
+  // }
+
   const handleProvinceChange = (provCode: string) => {
-    setShippingAddress(prev => ({ ...prev, province: provCode, city: '' }))
+    const provName = provinces.find(p => p.code === provCode)?.name || ''
+
+    setShippingAddress(prev => ({
+      ...prev,
+      province: provName, // simpan nama provinsi ke backend
+      city: '',           // reset kota
+    }))
+
     if (!provCode) {
       setRegencies([])
       return
     }
+
     fetch(`http://localhost:8000/api/proxy/regencies/${provCode}`)
       .then(res => res.json())
       .then(json => setRegencies(json.data))
@@ -74,7 +94,7 @@ export const Checkout = () => {
   }
 
   const subtotal = getCartTotal()
-  const shippingCost = shippingAddress.province === '53' ? 50000 : 100000
+  const shippingCost = shippingAddress.province === 'Nusa Tenggara Timur' ? 50000 : 100000
   const grandTotal = subtotal + shippingCost
 
   const formatPrice = (price: number) =>
@@ -229,7 +249,7 @@ export const Checkout = () => {
                   <select
                     id="province"
                     className="border rounded-md p-2 w-full"
-                    value={shippingAddress.province}
+                    value={provinces.find(p => p.name === shippingAddress.province)?.code || ''}
                     onChange={(e) => handleProvinceChange(e.target.value)}
                   >
                     <option value="">Pilih Provinsi</option>
